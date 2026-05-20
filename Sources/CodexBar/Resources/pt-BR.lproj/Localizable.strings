@@ -404,6 +404,8 @@
 "language_subtitle" = "Altera o idioma de exibição. Requer reiniciar o app para ter efeito completo.";
 "language_system" = "Sistema";
 "language_english" = "Inglês";
+"language_spanish" = "Espanhol";
+"language_catalan" = "Catalão";
 "language_chinese_simplified" = "Chinês simplificado";
 "language_portuguese_brazilian" = "Português (Brasil)";
 "start_at_login_title" = "Iniciar ao fazer login";
@@ -631,6 +633,9 @@
 "refresh_5min" = "5 min";
 "refresh_15min" = "15 min";
 "refresh_30min" = "30 min";
+
+/* Additional keys */
+"not_found" = "Não encontrado";
 
 /* Cost estimation */
 "cost_header_estimated" = "Custo (estimado)";
