@@ -36,6 +36,111 @@ extension UsageMenuCardView.Model {
             self.tokenUsage != nil
     }
 
+    func hasCompatibleTrackedLayout(with candidate: Self) -> Bool {
+        guard self.provider == candidate.provider,
+              self.metrics.count == candidate.metrics.count,
+              self.usageNotes == candidate.usageNotes,
+              (self.openAIAPIUsage == nil) == (candidate.openAIAPIUsage == nil),
+              Self.hasCompatibleCreditsLayout(
+                  currentText: self.creditsText,
+                  currentRemaining: self.creditsRemaining,
+                  candidateText: candidate.creditsText,
+                  candidateRemaining: candidate.creditsRemaining),
+              self.creditsHintText == candidate.creditsHintText,
+              self.placeholder == candidate.placeholder,
+              Self.hasCompatibleDashboardLayout(self.inlineUsageDashboard, candidate.inlineUsageDashboard),
+              Self.hasCompatibleProviderCostLayout(self.providerCost, candidate.providerCost),
+              Self.hasCompatibleTokenUsageLayout(self.tokenUsage, candidate.tokenUsage)
+        else {
+            return false
+        }
+
+        return zip(self.metrics, candidate.metrics).allSatisfy { current, refreshed in
+            current.id == refreshed.id &&
+                current.title == refreshed.title &&
+                current.percentStyle == refreshed.percentStyle &&
+                (current.statusText == nil) == (refreshed.statusText == nil) &&
+                (current.resetText == nil) == (refreshed.resetText == nil) &&
+                (current.detailText == nil) == (refreshed.detailText == nil) &&
+                (current.detailLeftText == nil) == (refreshed.detailLeftText == nil) &&
+                (current.detailRightText == nil) == (refreshed.detailRightText == nil) &&
+                current.cardStyle == refreshed.cardStyle
+        }
+    }
+
+    private static func hasCompatibleCreditsLayout(
+        currentText: String?,
+        currentRemaining: Double?,
+        candidateText: String?,
+        candidateRemaining: Double?) -> Bool
+    {
+        switch (currentText, candidateText) {
+        case (nil, nil):
+            return true
+        case let (currentText?, candidateText?):
+            guard (currentRemaining == nil) == (candidateRemaining == nil) else { return false }
+            // Numeric balances render as a fixed single line beside the full-scale label.
+            // Multiline workspace balances retain their measured text until the menu reopens.
+            return currentRemaining != nil || currentText == candidateText
+        default:
+            return false
+        }
+    }
+
+    private static func hasCompatibleDashboardLayout(
+        _ current: InlineUsageDashboardModel?,
+        _ candidate: InlineUsageDashboardModel?) -> Bool
+    {
+        switch (current, candidate) {
+        case (nil, nil):
+            true
+        case let (current?, candidate?):
+            current.valueStyle == candidate.valueStyle &&
+                current.kpis.count == candidate.kpis.count &&
+                current.points.count == candidate.points.count &&
+                current.detailLines.count == candidate.detailLines.count &&
+                zip(current.kpis, candidate.kpis).allSatisfy {
+                    $0.title == $1.title && $0.emphasis == $1.emphasis
+                } &&
+                zip(current.points, candidate.points).allSatisfy {
+                    $0.id == $1.id && $0.label == $1.label
+                }
+        default:
+            false
+        }
+    }
+
+    private static func hasCompatibleProviderCostLayout(
+        _ current: ProviderCostSection?,
+        _ candidate: ProviderCostSection?) -> Bool
+    {
+        switch (current, candidate) {
+        case (nil, nil):
+            true
+        case let (current?, candidate?):
+            current.title == candidate.title &&
+                (current.percentUsed == nil) == (candidate.percentUsed == nil) &&
+                (current.percentLine == nil) == (candidate.percentLine == nil)
+        default:
+            false
+        }
+    }
+
+    private static func hasCompatibleTokenUsageLayout(
+        _ current: TokenUsageSection?,
+        _ candidate: TokenUsageSection?) -> Bool
+    {
+        switch (current, candidate) {
+        case (nil, nil):
+            true
+        case let (current?, candidate?):
+            current.hintLine == candidate.hintLine &&
+                current.errorLine == candidate.errorLine
+        default:
+            false
+        }
+    }
+
     static func progressColor(for provider: UsageProvider) -> Color {
         if provider == .elevenlabs {
             return Color(nsColor: .labelColor)
