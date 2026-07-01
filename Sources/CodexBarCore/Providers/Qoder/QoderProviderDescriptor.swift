@@ -466,6 +466,7 @@ struct QoderWebFetchStrategy: ProviderFetchStrategy {
             let lowercased = token.lowercased()
             let headerValue: String?
             if lowercased == "--config" || lowercased.hasPrefix("--config=") ||
+                lowercased.hasPrefix("--expand-") ||
                 self.shortCurlOptions(token, contain: "K")
             {
                 return nil
@@ -557,7 +558,9 @@ struct QoderWebFetchStrategy: ProviderFetchStrategy {
         let pieces = trimmed.split(separator: ":", maxSplits: 1, omittingEmptySubsequences: false)
         guard pieces.count == 2 else {
             let lowercased = trimmed.lowercased()
-            if lowercased == "host" || lowercased.hasPrefix("host ") || lowercased.hasPrefix("host\t") {
+            if lowercased == "host" || lowercased.hasPrefix("host ") || lowercased.hasPrefix("host\t") ||
+                lowercased == "host;" || lowercased.hasPrefix("host;")
+            {
                 return .invalid
             }
             return .ignored
