@@ -164,6 +164,26 @@ struct AntigravityWarmAgyReuseTests {
     }
 
     @Test
+    func `other user agy is ignored`() async throws {
+        let listeningPIDs = AntigravityWarmLockedValues<Int>()
+
+        let result = try await AntigravityCLIHTTPSFetchStrategy.tryWarmAgyFetch(
+            timeout: 2.0,
+            dependencies: AntigravityCLIHTTPSFetchStrategy.WarmAgyDependencies(
+                processInfos: { _ in [Self.cliProcessInfo(pid: 6001), Self.cliProcessInfo(pid: 6002)] },
+                listeningPorts: { pid, _ in
+                    listeningPIDs.append(pid)
+                    return [pid]
+                },
+                fetchSnapshot: { _, _ in Self.usableSnapshot(email: "same-user@example.com") },
+                processOwnerUserID: { pid in pid == 6001 ? 502 : 501 },
+                currentUserID: { 501 }))
+
+        #expect(result?.accountEmail == "same-user@example.com")
+        #expect(listeningPIDs.value == [6002])
+    }
+
+    @Test
     func `account mismatch tries next warm agy`() async throws {
         let listeningPIDs = AntigravityWarmLockedValues<Int>()
 
