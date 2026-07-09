@@ -270,7 +270,8 @@ extension UsageStore {
                 let backfilled = stabilized.backfillingResetTimes(from: resetBackfillSource)
                 let predictivePaceWarningAccountDiscriminatorOverride: String? = if provider == .claude {
                     Self.predictivePaceWarningClaudeActiveAccountDiscriminator(
-                        context.claudeOAuthActiveAccountObservation)
+                        strategyKind: result.strategyKind,
+                        observation: context.claudeOAuthActiveAccountObservation)
                 } else {
                     nil
                 }

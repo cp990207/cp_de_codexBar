@@ -393,18 +393,30 @@ struct PredictivePaceWarningTests {
     }
 
     @Test
-    func `stable Claude account identity spans OAuth and fallback observations`() {
+    func `stable Claude account identity spans OAuth and CLI observations`() {
         let now = Date(timeIntervalSince1970: 1_780_000_000)
         let settings = self.makeSettings(suiteName: "PredictivePaceWarningTests-claude-active-account")
         settings.predictivePaceWarningNotificationsEnabled = true
         let notifier = NotifierSpy()
         let store = self.makeStore(settings: settings, notifier: notifier)
         let firstAccount = UsageStore.predictivePaceWarningClaudeActiveAccountDiscriminator(
-            .stable(identity: "account-a"))
+            strategyKind: .oauth,
+            observation: .stable(identity: "account-a"))
         let secondAccount = UsageStore.predictivePaceWarningClaudeActiveAccountDiscriminator(
-            .stable(identity: "account-b"))
-        #expect(UsageStore.predictivePaceWarningClaudeActiveAccountDiscriminator(.stable(identity: nil)) == nil)
-        #expect(UsageStore.predictivePaceWarningClaudeActiveAccountDiscriminator(.changed) == nil)
+            strategyKind: .cli,
+            observation: .stable(identity: "account-b"))
+        #expect(UsageStore.predictivePaceWarningClaudeActiveAccountDiscriminator(
+            strategyKind: .oauth,
+            observation: .stable(identity: nil)) == nil)
+        #expect(UsageStore.predictivePaceWarningClaudeActiveAccountDiscriminator(
+            strategyKind: .cli,
+            observation: .changed) == nil)
+        #expect(UsageStore.predictivePaceWarningClaudeActiveAccountDiscriminator(
+            strategyKind: .web,
+            observation: .stable(identity: "account-a")) == nil)
+        #expect(UsageStore.predictivePaceWarningClaudeActiveAccountDiscriminator(
+            strategyKind: .apiToken,
+            observation: .stable(identity: "account-a")) == nil)
         let noEmailRisk = self.snapshot(
             now: now,
             sessionUsed: 80,

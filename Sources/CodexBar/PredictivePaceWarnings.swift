@@ -202,8 +202,15 @@ extension UsageStore {
     }
 
     static func predictivePaceWarningClaudeActiveAccountDiscriminator(
-        _ observation: ClaudeOAuthActiveAccountObservation) -> String?
+        strategyKind: ProviderFetchKind,
+        observation: ClaudeOAuthActiveAccountObservation) -> String?
     {
+        switch strategyKind {
+        case .cli, .oauth:
+            break
+        case .apiToken, .localProbe, .web, .webDashboard:
+            return nil
+        }
         guard case let .stable(identity) = observation,
               let identity = identity?.trimmingCharacters(in: .whitespacesAndNewlines),
               !identity.isEmpty
