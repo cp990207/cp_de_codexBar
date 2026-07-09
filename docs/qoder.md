@@ -17,11 +17,12 @@ CodexBar reads Qoder big model credit usage from the Qoder account dashboard. It
 2. Enable **Qoder**.
 3. Sign in to [qoder.com](https://qoder.com/account/usage) or [qoder.com.cn](https://qoder.com.cn/account/usage) in
    Chrome.
-4. Leave Cookie source on **Automatic**, or switch to **Manual** and paste a `Cookie:` header or cURL capture from the
-   Qoder usage page.
+4. Leave Cookie source on **Automatic**, or switch to **Manual**. For `qoder.com`, paste a `Cookie:` header or a cURL/
+   HTTP request capture from the usage page. For `qoder.com.cn`, paste a request capture that includes the China URL
+   or `Host` header so CodexBar can select the matching site.
 
-Manual cURL captures are parsed only when the target URL or header host clearly belongs to `qoder.com` or
-`qoder.com.cn`.
+Bare `Cookie:` headers default to `qoder.com`. Request captures are parsed only when the target URL or header host
+clearly belongs to `qoder.com` or `qoder.com.cn`.
 
 ## Data Source
 
@@ -50,8 +51,9 @@ codexbar usage --provider qoder --verbose
 
 ### "Qoder session cookie not found"
 
-Sign in to Qoder in Chrome, then refresh CodexBar. If browser import is unavailable, switch to
-manual mode and paste a fresh `Cookie:` header or cURL capture from the usage page.
+Sign in to Qoder in Chrome, then refresh CodexBar. If browser import is unavailable, switch to manual mode. Paste a
+fresh `Cookie:` header for `qoder.com`; for `qoder.com.cn`, paste a cURL/HTTP request capture containing the China URL
+or `Host` header.
 
 ### "Qoder session is invalid or expired"
 
