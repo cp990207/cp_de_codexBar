@@ -55,9 +55,7 @@ struct SettingsDefaultsState {
     var providerStorageFootprintsEnabled: Bool
     var jetbrainsIDEBasePath: String
     var mergeIcons: Bool
-    var switcherShowsIcons: Bool
     var mergedMenuLastSelectedWasOverview: Bool
-    var mergedOverviewSelectedProvidersRaw: [String]
     var selectedMenuProviderRaw: String?
     var providerDetectionCompleted: Bool
     var providersSortedAlphabetically: Bool

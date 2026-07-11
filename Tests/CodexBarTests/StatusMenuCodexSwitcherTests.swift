@@ -252,7 +252,10 @@ struct StatusMenuCodexSwitcherTests {
         let settings = self.makeSettings()
         settings.statusChecksEnabled = false
         settings.refreshFrequency = .manual
-        settings.mergeIcons = true
+        // Merged multi-provider menus always open on Overview now (no more top-level provider
+        // tab); the Codex account switcher's behavior below is exercised through the
+        // still-unaffected single-provider (non-merged) menu path instead.
+        settings.mergeIcons = false
         settings.selectedMenuProvider = .codex
         settings.multiAccountMenuLayout = .segmented
 
@@ -262,7 +265,7 @@ struct StatusMenuCodexSwitcherTests {
             settings.setProviderEnabled(
                 provider: provider,
                 metadata: metadata,
-                enabled: provider == .codex || provider == .claude)
+                enabled: provider == .codex)
         }
 
         let managedAccountID = try #require(UUID(uuidString: "AAAAAAAA-BBBB-CCCC-DDDD-111111111111"))
@@ -1009,7 +1012,10 @@ extension StatusMenuCodexSwitcherTests {
         let settings = self.makeSettings()
         settings.statusChecksEnabled = false
         settings.refreshFrequency = .manual
-        settings.mergeIcons = true
+        // Merged multi-provider menus always open on Overview now (no more top-level provider
+        // tab); the Codex account switcher's behavior below is exercised through the
+        // still-unaffected single-provider (non-merged) menu path instead.
+        settings.mergeIcons = false
         settings.selectedMenuProvider = .codex
         settings.multiAccountMenuLayout = .segmented
 
@@ -1019,7 +1025,7 @@ extension StatusMenuCodexSwitcherTests {
             settings.setProviderEnabled(
                 provider: provider,
                 metadata: metadata,
-                enabled: provider == .codex || provider == .claude)
+                enabled: provider == .codex)
         }
 
         let managedAccountID = try #require(UUID(uuidString: "AAAAAAAA-BBBB-CCCC-DDDD-111111111111"))
@@ -1093,7 +1099,10 @@ extension StatusMenuCodexSwitcherTests {
         let settings = self.makeSettings()
         settings.statusChecksEnabled = false
         settings.refreshFrequency = .manual
-        settings.mergeIcons = true
+        // Merged multi-provider menus always open on Overview now (no more top-level provider
+        // tab); the Codex account switcher's behavior below is exercised through the
+        // still-unaffected single-provider (non-merged) menu path instead.
+        settings.mergeIcons = false
         settings.selectedMenuProvider = .codex
         settings.multiAccountMenuLayout = .segmented
 
@@ -1103,7 +1112,7 @@ extension StatusMenuCodexSwitcherTests {
             settings.setProviderEnabled(
                 provider: provider,
                 metadata: metadata,
-                enabled: provider == .codex || provider == .claude)
+                enabled: provider == .codex)
         }
 
         let managedAccountID = try #require(UUID(uuidString: "AAAAAAAA-BBBB-CCCC-DDDD-111111111111"))

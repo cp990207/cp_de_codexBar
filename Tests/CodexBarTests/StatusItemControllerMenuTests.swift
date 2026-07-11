@@ -40,6 +40,32 @@ struct StatusItemControllerMenuTests {
             updatedAt: Date())
     }
 
+    /// Mirrors the deleted `StatusItemController.switcherWeeklyMetricPercent` (previously used
+    /// only by the tab-style provider switcher's quota-fill strip, now removed). The underlying
+    /// per-provider rate-window resolution it wrapped (`UsageSnapshot.switcherWeeklyWindow`,
+    /// `MenuBarMetricWindowResolver`) is still live production code used elsewhere (e.g. the
+    /// menu-bar icon), so these tests keep exercising it directly through this local helper.
+    private func weeklyMetricPercent(
+        for provider: UsageProvider,
+        snapshot: UsageSnapshot?,
+        showUsed: Bool,
+        preference: MenuBarMetricPreference = .automatic) -> Double?
+    {
+        let window: RateWindow? = if preference == .monthlyPlan {
+            MenuBarMetricWindowResolver.rateWindow(
+                preference: preference,
+                provider: provider,
+                snapshot: snapshot,
+                supportsAverage: false)
+        } else if provider == .mistral {
+            nil
+        } else {
+            snapshot?.switcherWeeklyWindow(for: provider, showUsed: showUsed)
+        }
+        guard let window else { return nil }
+        return showUsed ? window.usedPercent : window.remainingPercent
+    }
+
     @Test
     func `cursor switcher falls back to on demand budget when plan exhausted and showing remaining`() {
         let primary = RateWindow(usedPercent: 100, windowMinutes: nil, resetsAt: nil, resetDescription: nil)
@@ -51,7 +77,7 @@ struct StatusItemControllerMenuTests {
             updatedAt: Date())
         let snapshot = self.makeSnapshot(primary: primary, secondary: secondary, providerCost: providerCost)
 
-        let percent = StatusItemController.switcherWeeklyMetricPercent(
+        let percent = self.weeklyMetricPercent(
             for: .cursor,
             snapshot: snapshot,
             showUsed: false)
@@ -65,7 +91,7 @@ struct StatusItemControllerMenuTests {
         let secondary = RateWindow(usedPercent: 36, windowMinutes: nil, resetsAt: nil, resetDescription: nil)
         let snapshot = self.makeSnapshot(primary: primary, secondary: secondary)
 
-        let percent = StatusItemController.switcherWeeklyMetricPercent(
+        let percent = self.weeklyMetricPercent(
             for: .cursor,
             snapshot: snapshot,
             showUsed: true)
@@ -79,7 +105,7 @@ struct StatusItemControllerMenuTests {
         let secondary = RateWindow(usedPercent: 40, windowMinutes: nil, resetsAt: nil, resetDescription: nil)
         let snapshot = self.makeSnapshot(primary: primary, secondary: secondary)
 
-        let percent = StatusItemController.switcherWeeklyMetricPercent(
+        let percent = self.weeklyMetricPercent(
             for: .cursor,
             snapshot: snapshot,
             showUsed: false)
@@ -93,7 +119,7 @@ struct StatusItemControllerMenuTests {
         let secondary = RateWindow(usedPercent: 36, windowMinutes: nil, resetsAt: nil, resetDescription: nil)
         let snapshot = self.makeSnapshot(primary: primary, secondary: secondary)
 
-        let percent = StatusItemController.switcherWeeklyMetricPercent(
+        let percent = self.weeklyMetricPercent(
             for: .cursor,
             snapshot: snapshot,
             showUsed: false)
@@ -108,7 +134,7 @@ struct StatusItemControllerMenuTests {
         let tertiary = RateWindow(usedPercent: 24, windowMinutes: nil, resetsAt: nil, resetDescription: nil)
         let snapshot = self.makeSnapshot(primary: primary, secondary: secondary, tertiary: tertiary)
 
-        let percent = StatusItemController.switcherWeeklyMetricPercent(
+        let percent = self.weeklyMetricPercent(
             for: .perplexity,
             snapshot: snapshot,
             showUsed: false)
@@ -129,7 +155,7 @@ struct StatusItemControllerMenuTests {
             ],
             updatedAt: Date())
 
-        let percent = StatusItemController.switcherWeeklyMetricPercent(
+        let percent = self.weeklyMetricPercent(
             for: .mistral,
             snapshot: snapshot,
             showUsed: true,
@@ -149,7 +175,7 @@ struct StatusItemControllerMenuTests {
             secondary: nil,
             updatedAt: Date())
 
-        let percent = StatusItemController.switcherWeeklyMetricPercent(
+        let percent = self.weeklyMetricPercent(
             for: .mistral,
             snapshot: snapshot,
             showUsed: true,

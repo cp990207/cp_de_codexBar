@@ -210,7 +210,7 @@ struct ProviderStorageFootprintTests {
 
     @Test
     @MainActor
-    func `overview row carries storage text outside provider detail model`() throws {
+    func `overview row summarizes usage metrics and omits storage text`() throws {
         let now = Date()
         let metadata = try #require(ProviderDefaults.metadata[.claude])
         let snapshot = UsageSnapshot(
@@ -242,11 +242,59 @@ struct ProviderStorageFootprintTests {
             hidePersonalInfo: false,
             now: now))
 
-        let overview = OverviewMenuCardRowView(model: model, storageText: "1.5 GB", width: 310)
+        let overview = OverviewMenuCardRowView(model: model, width: 310)
         let detail = UsageMenuCardView(model: model, width: 310)
 
-        #expect(overview.storageText == "1.5 GB")
+        // The compact overview row renders a progress-bar line per quota metric (Claude has real
+        // percent-based usage windows), not a squeezed one-line text summary.
+        #expect(!model.metrics.isEmpty)
+        #expect(model.metrics.allSatisfy { $0.statusText?.isEmpty != false })
+        #expect(overview.model.provider == UsageProvider.claude)
         #expect(detail.model.provider == UsageProvider.claude)
+    }
+
+    @Test
+    @MainActor
+    func `overview row shows deepseek balance instead of synthetic percentage`() throws {
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let metadata = try #require(ProviderDefaults.metadata[.deepseek])
+        let snapshot = DeepSeekUsageSnapshot(
+            isAvailable: true,
+            currency: "USD",
+            totalBalance: 12.34,
+            grantedBalance: 2.34,
+            toppedUpBalance: 10,
+            updatedAt: now)
+            .toUsageSnapshot()
+        let model = UsageMenuCardView.Model.make(.init(
+            provider: .deepseek,
+            metadata: metadata,
+            snapshot: snapshot,
+            credits: nil,
+            creditsError: nil,
+            dashboard: nil,
+            dashboardError: nil,
+            tokenSnapshot: nil,
+            tokenError: nil,
+            account: AccountInfo(email: nil, plan: nil),
+            isRefreshing: false,
+            lastError: nil,
+            usageBarsShowUsed: true,
+            resetTimeDisplayStyle: .countdown,
+            tokenCostUsageEnabled: false,
+            showOptionalCreditsAndExtraUsage: true,
+            hidePersonalInfo: false,
+            now: now))
+
+        // DeepSeek is pay-as-you-go: its metric carries a currency `statusText` and must never
+        // render as a percentage anywhere (Overview header text or a progress bar).
+        let metric = try #require(model.metrics.first)
+        let statusText = try #require(metric.statusText)
+        #expect(statusText.contains("$12.34"))
+        #expect(!statusText.contains("%"))
+
+        let overview = OverviewMenuCardRowView(model: model, width: 310)
+        #expect(overview.model.provider == UsageProvider.deepseek)
     }
 
     @Test
@@ -284,10 +332,15 @@ struct ProviderStorageFootprintTests {
             showOptionalCreditsAndExtraUsage: true,
             hidePersonalInfo: false,
             now: Date(timeIntervalSince1970: 0)))
-        let overview = OverviewMenuCardRowView(model: model, storageText: "10 B", width: 310)
+        let overview = OverviewMenuCardRowView(model: model, width: 310)
 
+        // Cleanup recommendations live in the storage detail view; the compact overview row is
+        // number-only and never surfaces storage text. With no metrics at all, the row falls
+        // back to credits/spend/subtitle text instead.
         #expect(detailView.cleanupRecommendations.map(\.path) == ["\(root)/projects"])
-        #expect(overview.storageText == "10 B")
+        #expect(model.metrics.isEmpty)
+        #expect(!OverviewMenuCardRowView.fallbackSummaryText(for: model).isEmpty)
+        #expect(overview.model.provider == UsageProvider.claude)
     }
 
     @Test

@@ -105,14 +105,6 @@ struct PreferencesPaneSmokeTests {
     }
 
     @Test
-    func `overview provider limit text formats numeric limit as object argument`() {
-        let text = DisplayPane.overviewProviderLimitText(limit: 3)
-
-        #expect(text.contains("3"))
-        #expect(!text.contains("%@"))
-    }
-
-    @Test
     func `cost history days editor builds with clamped settings binding`() {
         let settings = Self.makeSettingsStore(suite: "PreferencesPaneSmokeTests-cost-history-days")
 

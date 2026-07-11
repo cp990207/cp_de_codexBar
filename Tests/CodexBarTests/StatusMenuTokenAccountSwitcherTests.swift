@@ -291,7 +291,10 @@ final class StatusMenuTokenAccountSwitcherTests: XCTestCase {
         let settings = self.makeSettings()
         settings.statusChecksEnabled = false
         settings.refreshFrequency = .manual
-        settings.mergeIcons = true
+        // Merged multi-provider menus always open on Overview now (no more top-level provider
+        // tab); the token account switcher's behavior below is exercised through the
+        // still-unaffected single-provider (non-merged) menu path instead.
+        settings.mergeIcons = false
         settings.selectedMenuProvider = .claude
         settings.multiAccountMenuLayout = .segmented
         let registry = ProviderRegistry.shared
@@ -300,7 +303,7 @@ final class StatusMenuTokenAccountSwitcherTests: XCTestCase {
             settings.setProviderEnabled(
                 provider: provider,
                 metadata: metadata,
-                enabled: provider == .claude || provider == .codex)
+                enabled: provider == .claude)
         }
         settings.addTokenAccount(provider: .claude, label: "Primary", token: "Bearer sk-ant-oat-primary")
         settings.addTokenAccount(provider: .claude, label: "Secondary", token: "Bearer sk-ant-oat-secondary")

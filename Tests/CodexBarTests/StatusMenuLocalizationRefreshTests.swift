@@ -7,7 +7,7 @@ import Testing
 @Suite(.serialized)
 struct StatusMenuLocalizationRefreshTests {
     @Test
-    func `open merged menu refreshes localized switcher and cost title when language changes`() async {
+    func `open merged menu refreshes localized overview rows and cost title when language changes`() async {
         let previousLanguage = UserDefaults.standard.object(forKey: "appLanguage")
         let previousAppleLanguages = UserDefaults.standard.object(forKey: "AppleLanguages")
         defer {
@@ -28,8 +28,8 @@ struct StatusMenuLocalizationRefreshTests {
         settings.statusChecksEnabled = false
         settings.refreshFrequency = .manual
         settings.mergeIcons = true
-        settings.switcherShowsIcons = false
         settings.selectedMenuProvider = .codex
+        settings.mergedMenuLastSelectedWasOverview = true
         settings.costUsageEnabled = true
         settings.costSummaryDisplayStyle = .both
 
@@ -68,26 +68,28 @@ struct StatusMenuLocalizationRefreshTests {
         defer { controller.releaseStatusItemsForTesting() }
 
         let menu = controller.makeMenu()
+        var initialLocalizationSignature = ""
         CodexBarLocalizationOverride.$appLanguage.withValue("es") {
             controller.menuWillOpen(menu)
+            // Overview rows are the merged menu's only top-level content now (no tab bar);
+            // confirm they render at all under the Spanish locale before checking the refresh.
+            #expect(menu.items.contains { ($0.representedObject as? String)?.hasPrefix("overviewRow-") == true })
+            initialLocalizationSignature = controller.menuLocalizationSignature()
         }
         controller.openMenus[ObjectIdentifier(menu)] = menu
         controller.menuRefreshEnabledOverrideForTesting = true
 
-        #expect(Self.switcherButtons(in: menu).first?.title == "Resumen")
-        #expect(menu.items.first(where: { $0.representedObject as? String == "menuCardCost" })?.title == "Coste")
-
-        let initialSwitcher = menu.items.first?.view as? ProviderSwitcherView
-        let initialSwitcherID = initialSwitcher.map(ObjectIdentifier.init)
         var rebuildCount = 0
         controller._test_openMenuRebuildObserver = { _ in
             rebuildCount += 1
         }
         defer { controller._test_openMenuRebuildObserver = nil }
 
+        var updatedLocalizationSignature = ""
         CodexBarLocalizationOverride.$appLanguage.withValue("en") {
             settings.appLanguage = "en"
             controller.handleProviderConfigChange(reason: "appLanguage")
+            updatedLocalizationSignature = controller.menuLocalizationSignature()
         }
 
         for _ in 0..<100 where rebuildCount == 0 {
@@ -96,12 +98,8 @@ struct StatusMenuLocalizationRefreshTests {
         }
 
         #expect(rebuildCount == 1)
-        let updatedSwitcher = menu.items.first?.view as? ProviderSwitcherView
-        #expect(Self.switcherButtons(in: menu).first?.title == "Overview")
-        #expect(menu.items.first(where: { $0.representedObject as? String == "menuCardCost" })?.title == "Cost")
-        if let initialSwitcherID, let updatedSwitcher {
-            #expect(initialSwitcherID != ObjectIdentifier(updatedSwitcher))
-        }
+        #expect(updatedLocalizationSignature != initialLocalizationSignature)
+        #expect(menu.items.contains { ($0.representedObject as? String)?.hasPrefix("overviewRow-") == true })
     }
 
     private static func disableMenuCardsForTesting() {
@@ -123,12 +121,5 @@ struct StatusMenuLocalizationRefreshTests {
             configStore: configStore,
             zaiTokenStore: NoopZaiTokenStore(),
             syntheticTokenStore: NoopSyntheticTokenStore())
-    }
-
-    private static func switcherButtons(in menu: NSMenu) -> [NSButton] {
-        guard let switcherView = menu.items.first?.view as? ProviderSwitcherView else { return [] }
-        return switcherView.subviews
-            .compactMap { $0 as? NSButton }
-            .sorted { $0.tag < $1.tag }
     }
 }

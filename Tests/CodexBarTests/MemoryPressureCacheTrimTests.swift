@@ -102,32 +102,17 @@ struct MemoryPressureCacheTrimTests {
             width: 30000,
             textScale: StatusItemController.menuCardHeightTextScaleToken(),
             fingerprint: "content:stable")
-        let menu = NSMenu()
-        let entry = CachedMergedSwitcherMenuContent(
-            requiredMenuContentVersion: 0,
-            menuWidth: 300,
-            codexAccountDisplay: nil,
-            tokenAccountDisplay: nil,
-            localizationSignature: "",
-            items: [])
-
         controller.menuCardHeightCache[key] = 42
         controller.measuredStandardMenuWidthCache["width"] = 300
-        controller.mergedSwitcherContentCaches[ObjectIdentifier(menu)] = [
-            .overview: entry,
-            .provider(.codex): entry,
-        ]
         controller.menuCardViewRecyclePool["card"] = NSView()
 
         let summary = controller.trimRebuildableCachesForMemoryPressure()
 
         #expect(summary.menuCardHeights == 1)
         #expect(summary.menuWidths == 1)
-        #expect(summary.mergedSwitcherSelections == 2)
         #expect(summary.recycledMenuCardViews == 1)
         #expect(controller.menuCardHeightCache.isEmpty)
         #expect(controller.measuredStandardMenuWidthCache.isEmpty)
-        #expect(controller.mergedSwitcherContentCaches.isEmpty)
         #expect(controller.menuCardViewRecyclePool.isEmpty)
     }
 

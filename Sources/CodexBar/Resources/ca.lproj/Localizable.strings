@@ -60,9 +60,6 @@
 "Check provider status" = "Comproveu l'estat del proveïdor";
 "Choose Codex workspace" = "Trieu l'espai de treball de Codex";
 "Choose the MiniMax host (global .io or China mainland .com)." = "Trieu l'amfitrió de MiniMax (global .io o la Xina continental .com).";
-"Choose up to " = "Trieu fins a ";
-"Choose up to \\(Self.maxOverviewProviders) providers" = "Trieu fins a \\(Self.maxOverviewProviders) proveïdors";
-"Choose up to \\(count) providers" = "Trieu fins a \\(count) proveïdors";
 "Choose what to show in the menu bar (Pace shows usage vs. expected)." = "Trieu què es mostra a la barra de menús (Ritme mostra l'ús respecte al previst).";
 "Choose which Codex account CodexBar should follow." = "Trieu quin compte de Codex ha de seguir el CodexBar.";
 "Choose which window drives the menu bar percent." = "Trieu quina finestra determina el percentatge de la barra de menús.";
@@ -385,7 +382,6 @@
 "metric_tertiary" = "Terciari (%@)";
 "multiple_workspaces_found" = "El CodexBar ha trobat diversos espais de treball per a %@. Trieu l'espai de treball que voleu afegir.";
 "ory_session_…=…; csrftoken=…" = "ory_session_…=…; csrftoken=…";
-"overview_choose_providers" = "Trieu fins a %@ proveïdors";
 "remove_account_message" = "Voleu eliminar %@ del CodexBar? El seu directori Codex gestionat s'esborrarà.";
 "version_format" = "Versió %@";
 "vertex_ai_login_instructions" = "Per fer un seguiment de l'ús de Vertex AI, autentiqueu-vos amb Google Cloud.\n\n1. Obriu el Terminal\n2. Executeu: gcloud auth application-default login\n3. Seguiu les indicacions del navegador per iniciar la sessió\n4. Definiu el vostre projecte: gcloud config set project PROJECT_ID\n\nVoleu obrir el Terminal ara?";
@@ -501,9 +497,7 @@
 /* Display Pane */
 "section_menu_bar" = "Barra de menús";
 "merge_icons_title" = "Combina les icones";
-"merge_icons_subtitle" = "Feu servir una sola icona a la barra de menús amb un selector de proveïdor.";
-"switcher_shows_icons_title" = "El selector mostra icones";
-"switcher_shows_icons_subtitle" = "Mostreu les icones de proveïdor al selector (si no, mostreu una línia de progrés setmanal).";
+"merge_icons_subtitle" = "Feu servir una sola icona a la barra de menús amb una visió general de tots els proveïdors.";
 "show_most_used_provider_title" = "Mostreu el proveïdor més utilitzat";
 "show_most_used_provider_subtitle" = "La barra de menús mostra automàticament el proveïdor més a prop del seu límit.";
 "menu_bar_shows_percent_title" = "La barra de menús mostra el percentatge";
@@ -531,12 +525,7 @@
 "multi_account_layout_subtitle" = "Trieu el canvi de compte segmentat o targetes de compte apilades.";
 "multi_account_layout_segmented" = "Segmentat";
 "multi_account_layout_stacked" = "Apilat";
-"overview_tab_providers_title" = "Proveïdors de la pestanya Resum";
 "configure" = "Configureu…";
-"overview_enable_merge_icons_hint" = "Activeu Combina les icones per configurar els proveïdors de la pestanya Resum.";
-"overview_no_providers_hint" = "No hi ha proveïdors activats disponibles per al Resum.";
-"overview_rows_follow_order" = "Les files del Resum sempre segueixen l'ordre dels proveïdors.";
-"overview_no_providers_selected" = "No hi ha cap proveïdor seleccionat";
 
 /* Advanced Pane */
 "section_keyboard_shortcut" = "Drecera de teclat";
@@ -1088,7 +1077,6 @@
 "No local data found" = "No s'han trobat dades locals";
 "No OpenCode session cookies found in browsers." = "No s'han trobat galetes de sessió d'OpenCode als navegadors.";
 "No overview data available." = "No hi ha dades de resum disponibles.";
-"No providers selected for Overview." = "No hi ha cap proveïdor seleccionat per al Resum.";
 "No usage breakdown data available." = "No hi ha dades de desglossament d'ús disponibles.";
 "No utilization data yet." = "Encara no hi ha dades d'utilització.";
 "not detected" = "no detectat";

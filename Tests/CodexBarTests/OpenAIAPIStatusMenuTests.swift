@@ -162,6 +162,10 @@ extension StatusMenuTests {
         let settings = self.makeSettings()
         settings.statusChecksEnabled = false
         settings.refreshFrequency = .manual
+        // Force the single-provider (non-merged) menu path: `makeMenu(for:)` only honors its
+        // explicit provider when merge icons is off — with mergeIcons on and >1 enabled provider,
+        // the merged menu now always opens on Overview instead.
+        settings.mergeIcons = false
         settings.selectedMenuProvider = .mistral
         settings.costUsageEnabled = false
         settings.costSummaryDisplayStyle = .inlineSummary
@@ -209,7 +213,6 @@ extension StatusMenuTests {
         let model = try #require(controller.menuCardModel(for: .mistral))
         #expect(model.inlineUsageDashboard != nil)
         #expect(model.tokenUsage == nil)
-        #expect(controller.makeOverviewRowSubmenu(provider: .mistral, model: model, width: 320) != nil)
 
         let menu = controller.makeMenu(for: .mistral)
         controller.menuWillOpen(menu)

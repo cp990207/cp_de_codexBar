@@ -59,9 +59,6 @@
 "Check provider status" = "Vérifier le statut du fournisseur";
 "Choose Codex workspace" = "Choisissez l'espace de travail Codex";
 "Choose the MiniMax host (global .io or China mainland .com)." = "Choisissez l'hôte MiniMax (global .io ou Chine continentale .com).";
-"Choose up to " = "Choisissez jusqu'à ";
-"Choose up to \\(Self.maxOverviewProviders) providers" = "Choisissez jusqu'à \\(Self.maxOverviewProviders) fournisseurs";
-"Choose up to \\(count) providers" = "Choisissez jusqu'à \\(count) fournisseurs";
 "Choose what to show in the menu bar (Pace shows usage vs. expected)." = "Choisissez ce que vous voulez afficher dans la barre de menu (Pace affiche l'utilisation par rapport à celle attendue).";
 "Choose which Codex account CodexBar should follow." = "Choisissez quel compte Codex CodexBar doit suivre.";
 "Choose which window drives the menu bar percent." = "Choisissez quelle fenêtre gère le pourcentage de la barre de menus.";
@@ -383,7 +380,6 @@
 "metric_tertiary" = "Tertiaire (%@)";
 "multiple_workspaces_found" = "CodexBar a trouvé plusieurs espaces de travail pour %@. Veuillez choisir l'espace de travail à ajouter.";
 "ory_session_…=…; csrftoken=…" = "ory_session_…=…; csrftoken=…";
-"overview_choose_providers" = "Choisissez jusqu'à %@ fournisseurs";
 "remove_account_message" = "Supprimer %@ de CodexBar ? Sa maison Codex gérée sera supprimée.";
 "version_format" = "Version %@";
 "vertex_ai_login_instructions" = "Pour suivre l'utilisation de Vertex AI, authentifiez-vous auprès de Google Cloud.\n\n1. Ouvrez le terminal\n2. Exécutez : gcloud auth application-default login\n3. Suivez les invites du navigateur pour vous connecter\n4. Définissez votre projet : gcloud config set project PROJECT_ID\n\nOuvrir le terminal maintenant ?";
@@ -516,9 +512,7 @@
 /* Display Pane */
 "section_menu_bar" = "Barre de menus";
 "merge_icons_title" = "Fusionner les icônes";
-"merge_icons_subtitle" = "Utilisez une seule icône de barre de menu avec un sélecteur de fournisseur.";
-"switcher_shows_icons_title" = "Le commutateur affiche des icônes";
-"switcher_shows_icons_subtitle" = "Afficher les icônes des fournisseurs dans le sélecteur (sinon, afficher une ligne de progression hebdomadaire).";
+"merge_icons_subtitle" = "Utilisez une seule icône de barre de menu avec un aperçu de tous les fournisseurs.";
 "show_most_used_provider_title" = "Afficher le fournisseur le plus utilisé";
 "show_most_used_provider_subtitle" = "La barre de menu affiche automatiquement le fournisseur le plus proche de sa limite de débit.";
 "menu_bar_shows_percent_title" = "La barre de menu affiche le pourcentage";
@@ -546,12 +540,7 @@
 "multi_account_layout_subtitle" = "Choisissez un changement de compte segmenté ou des cartes de compte empilées.";
 "multi_account_layout_segmented" = "Segmenté";
 "multi_account_layout_stacked" = "Empilé";
-"overview_tab_providers_title" = "Fournisseurs d'onglets de présentation";
 "configure" = "Configurer…";
-"overview_enable_merge_icons_hint" = "Activez Fusionner les icônes pour configurer les fournisseurs d'onglets Présentation.";
-"overview_no_providers_hint" = "Aucun fournisseur activé disponible pour la présentation.";
-"overview_rows_follow_order" = "Les lignes de présentation suivent toujours l’ordre des fournisseurs.";
-"overview_no_providers_selected" = "Aucun fournisseur sélectionné";
 
 /* Advanced Pane */
 "section_keyboard_shortcut" = "Raccourci clavier";
@@ -804,7 +793,6 @@
 "Est. total (%@): %@" = "HNE. total (%@) : %@";
 "Hover a bar for details" = "Passez la souris sur une barre pour plus de détails";
 "%@: %@ · %@ tokens" = "%@ : %@ · %@ jetons";
-"No providers selected for Overview." = "Aucun fournisseur sélectionné pour la vue d'ensemble.";
 "No overview data available." = "Aucune donnée globale disponible.";
 "Auto uses the local IDE API first, then Google OAuth when the IDE is closed." = "Auto utilise d'abord l'API IDE locale, puis Google OAuth lorsque l'EDI est fermé.";
 "Login with Google" = "Connectez-vous avec Google";

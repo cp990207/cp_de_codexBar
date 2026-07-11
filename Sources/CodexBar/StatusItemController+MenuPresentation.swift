@@ -4,15 +4,6 @@ import Observation
 import SwiftUI
 
 extension StatusItemController {
-    func switcherWeeklyRemaining(for provider: UsageProvider) -> Double? {
-        let snapshot = self.store.snapshot(for: provider)
-        return Self.switcherWeeklyMetricPercent(
-            for: provider,
-            snapshot: snapshot,
-            showUsed: self.settings.usageBarsShowUsed,
-            preference: self.settings.menuBarMetricPreference(for: provider, snapshot: snapshot))
-    }
-
     func applySubtitle(_ subtitle: String, to item: NSMenuItem, title: String) {
         if #available(macOS 14.4, *) {
             // NSMenuItem.subtitle is only available on macOS 14.4+.

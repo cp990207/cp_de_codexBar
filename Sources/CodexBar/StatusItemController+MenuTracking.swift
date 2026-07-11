@@ -40,13 +40,9 @@ extension StatusItemController {
         #if DEBUG
         guard !self.isReleasedForTesting else { return }
         #endif
-        let preservesMergedSwitcherContentCaches = self.preservesMergedSwitcherContentCachesDuringInvalidation
         self.menuSession.invalidate(
             allowsStaleContent: allowStaleContentDuringDataRefresh,
-            requiresRebuild: !preservesMergedSwitcherContentCaches)
-        if !preservesMergedSwitcherContentCaches {
-            self.clearMergedSwitcherContentCaches()
-        }
+            requiresRebuild: true)
         self.pruneVersionScopedMenuCardHeightCache()
         guard self.isMenuRefreshEnabled else { return }
         if !self.openMenus.isEmpty {

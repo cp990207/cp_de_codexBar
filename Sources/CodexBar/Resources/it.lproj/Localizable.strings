@@ -60,9 +60,6 @@
 "Check provider status" = "Controlla stato provider";
 "Choose Codex workspace" = "Scegli il workspace Codex";
 "Choose the MiniMax host (global .io or China mainland .com)." = "Scegli l'host MiniMax (.io globale o .com per la Cina continentale).";
-"Choose up to " = "Scegli fino a ";
-"Choose up to \\(Self.maxOverviewProviders) providers" = "Scegli fino a \\(Self.maxOverviewProviders) provider";
-"Choose up to \\(count) providers" = "Scegli fino a \\(count) provider";
 "Choose what to show in the menu bar (Pace shows usage vs. expected)." = "Scegli cosa mostrare nella barra menu (Andamento mostra l'uso rispetto al previsto).";
 "Choose which Codex account CodexBar should follow." = "Scegli quale account Codex deve seguire CodexBar.";
 "Choose which window drives the menu bar percent." = "Scegli quale finestra determina la percentuale nella barra menu.";
@@ -386,7 +383,6 @@
 "metric_tertiary" = "Terziario (%@)";
 "multiple_workspaces_found" = "CodexBar ha trovato più workspace per %@. Scegli il workspace da aggiungere.";
 "ory_session_…=…; csrftoken=…" = "ory_session_…=…; csrftoken=…";
-"overview_choose_providers" = "Scegli fino a %@ provider";
 "remove_account_message" = "Rimuovere %@ da CodexBar? La sua home Codex gestita verrà eliminata.";
 "version_format" = "Versione %@";
 "vertex_ai_login_instructions" = "Per monitorare l'utilizzo di Vertex AI, autenticati con Google Cloud.\n\n1. Apri Terminale\n2. Esegui: gcloud auth application-default login\n3. Segui le istruzioni nel browser per accedere\n4. Imposta il progetto: gcloud config set project PROJECT_ID\n\nAprire Terminale ora?";
@@ -519,9 +515,7 @@
 /* Display Pane */
 "section_menu_bar" = "Barra menu";
 "merge_icons_title" = "Unisci icone";
-"merge_icons_subtitle" = "Usa un'unica icona nella barra menu con selettore provider.";
-"switcher_shows_icons_title" = "Selettore con icone";
-"switcher_shows_icons_subtitle" = "Mostra le icone provider nel selettore (altrimenti mostra una linea di progresso settimanale).";
+"merge_icons_subtitle" = "Usa un'unica icona nella barra menu con una panoramica di tutti i provider.";
 "show_most_used_provider_title" = "Mostra provider più usato";
 "show_most_used_provider_subtitle" = "La barra menu mostra automaticamente il provider più vicino al limite.";
 "menu_bar_shows_percent_title" = "Mostra percentuale nella barra menu";
@@ -549,12 +543,7 @@
 "multi_account_layout_subtitle" = "Scegli tra selezione segmentata o schede account impilate.";
 "multi_account_layout_segmented" = "Segmentato";
 "multi_account_layout_stacked" = "Impilato";
-"overview_tab_providers_title" = "Provider della scheda Panoramica";
 "configure" = "Configura…";
-"overview_enable_merge_icons_hint" = "Abilita Unisci icone per configurare i provider della scheda Panoramica.";
-"overview_no_providers_hint" = "Nessun provider attivo disponibile per Panoramica.";
-"overview_rows_follow_order" = "Le righe Panoramica seguono sempre l'ordine dei provider.";
-"overview_no_providers_selected" = "Nessun provider selezionato";
 
 /* Advanced Pane */
 "section_keyboard_shortcut" = "Scorciatoia tastiera";
@@ -808,7 +797,6 @@
 "Hover a bar for details" = "Passa il mouse su una barra per i dettagli";
 "%@: %@ · %@ tokens" = "%@: %@ • %@ token";
 "%@: %@" = "%@: %@";
-"No providers selected for Overview." = "Nessun provider selezionato per Panoramica.";
 "No overview data available." = "Nessun dato di panoramica disponibile.";
 "Auto uses the local IDE API first, then Google OAuth when the IDE is closed." = "Auto usa prima l'API IDE locale, poi Google OAuth quando l'IDE è chiuso.";
 "Login with Google" = "Accedi con Google";

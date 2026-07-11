@@ -24,6 +24,7 @@ final class GPUSelectionHostingView<Content: View>: NSView, MenuCardHighlighting
     private var tintFilter: CIFilter?
     private var isRowHighlighted = false
     private var onClick: (() -> Void)?
+    private var isPrimaryClickArmed = false
 
     private(set) var allowsMenuHighlight: Bool
 
@@ -62,9 +63,6 @@ final class GPUSelectionHostingView<Content: View>: NSView, MenuCardHighlighting
         self.refreshTintFilter()
         self.setupSelectionView()
         self.setupHosting()
-        if onClick != nil {
-            self.installClickRecognizer()
-        }
     }
 
     @available(*, unavailable)
@@ -82,6 +80,30 @@ final class GPUSelectionHostingView<Content: View>: NSView, MenuCardHighlighting
 
     override func acceptsFirstMouse(for _: NSEvent?) -> Bool {
         true
+    }
+
+    /// `NSMenu`'s tracking loop does not reliably dispatch gesture recognizers installed on custom
+    /// menu-item views. Keep pointer activation on the same explicit mouseDown/mouseUp path used by
+    /// the provider switcher so Overview rows remain clickable while the menu is tracking.
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        guard super.hitTest(point) != nil else { return nil }
+        return self
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        guard event.type == .leftMouseDown else {
+            super.mouseDown(with: event)
+            return
+        }
+        self.beginPrimaryClick(at: self.convert(event.locationInWindow, from: nil))
+    }
+
+    override func mouseUp(with event: NSEvent) {
+        guard event.type == .leftMouseUp else {
+            super.mouseUp(with: event)
+            return
+        }
+        self.finishPrimaryClick(at: self.convert(event.locationInWindow, from: nil))
     }
 
     override func viewDidChangeEffectiveAppearance() {
@@ -150,6 +172,12 @@ final class GPUSelectionHostingView<Content: View>: NSView, MenuCardHighlighting
     var swiftUIHighlightStateIsHighlightedForTesting: Bool {
         self.hosting.rootView.highlightState.isHighlighted
     }
+
+    func _test_simulatePrimaryClick(at point: NSPoint? = nil) {
+        let location = point ?? NSPoint(x: self.bounds.midX, y: self.bounds.midY)
+        self.beginPrimaryClick(at: location)
+        self.finishPrimaryClick(at: location)
+    }
     #endif
 
     private func setupSelectionView() {
@@ -172,14 +200,13 @@ final class GPUSelectionHostingView<Content: View>: NSView, MenuCardHighlighting
         self.addSubview(self.hosting)
     }
 
-    private func installClickRecognizer() {
-        let recognizer = NSClickGestureRecognizer(target: self, action: #selector(self.handlePrimaryClick(_:)))
-        recognizer.buttonMask = 0x1
-        self.addGestureRecognizer(recognizer)
+    private func beginPrimaryClick(at point: NSPoint) {
+        self.isPrimaryClickArmed = self.onClick != nil && self.bounds.contains(point)
     }
 
-    @objc private func handlePrimaryClick(_ recognizer: NSClickGestureRecognizer) {
-        guard recognizer.state == .ended else { return }
+    private func finishPrimaryClick(at point: NSPoint) {
+        defer { self.isPrimaryClickArmed = false }
+        guard self.isPrimaryClickArmed, self.bounds.contains(point) else { return }
         self.onClick?()
     }
 

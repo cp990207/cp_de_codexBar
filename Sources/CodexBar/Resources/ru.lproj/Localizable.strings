@@ -60,9 +60,6 @@
 "Check provider status" = "Проверить статус провайдера";
 "Choose Codex workspace" = "Выберите рабочую область Codex";
 "Choose the MiniMax host (global .io or China mainland .com)." = "Выберите хост MiniMax (глобальный .io или материковый Китай .com).";
-"Choose up to " = "Выберите до ";
-"Choose up to \\(Self.maxOverviewProviders) providers" = "Выберите до \\(Self.maxOverviewProviders) провайдеров";
-"Choose up to \\(count) providers" = "Выберите до \\(count) провайдеров";
 "Choose what to show in the menu bar (Pace shows usage vs. expected)." = "Выберите, что показывать в строке меню: темп сравнивает фактическое использование с ожидаемым.";
 "Choose which Codex account CodexBar should follow." = "Выберите аккаунт Codex, за которым должен следить CodexBar.";
 "Choose which window drives the menu bar percent." = "Выберите окно, по которому рассчитывается процент в строке меню.";
@@ -386,7 +383,6 @@
 "metric_tertiary" = "Третичный (%@)";
 "multiple_workspaces_found" = "CodexBar нашёл несколько рабочих областей для %@. Выберите рабочую область для добавления.";
 "ory_session_…=…; csrftoken=…" = "ory_session_…=…; csrftoken=…";
-"overview_choose_providers" = "Выберите до %@ провайдеров";
 "remove_account_message" = "Удалить %@ из CodexBar? Его управляемый каталог Codex будет удалён.";
 "version_format" = "Версия %@";
 "vertex_ai_login_instructions" = "Чтобы отслеживать использование Vertex AI, авторизуйтесь через Google Cloud.\n\n1. Откройте Terminal\n2. Запустите: gcloud auth application-default login\n3. Следуйте инструкциям в браузере\n4. Укажите проект: gcloud config set project PROJECT_ID\n\nОткрыть Terminal сейчас?";
@@ -517,9 +513,7 @@
 /* Display Pane */
 "section_menu_bar" = "Строка меню";
 "merge_icons_title" = "Объединять значки";
-"merge_icons_subtitle" = "Использовать один значок в строке меню с переключателем провайдеров.";
-"switcher_shows_icons_title" = "Показывать значки в переключателе";
-"switcher_shows_icons_subtitle" = "Показывать значки провайдеров в переключателе, иначе показывать строку недельного прогресса.";
+"merge_icons_subtitle" = "Использовать один значок в строке меню с обзором всех провайдеров.";
 "show_most_used_provider_title" = "Показывать провайдера с наибольшим использованием";
 "show_most_used_provider_subtitle" = "В строке меню автоматически отображается провайдер, ближайший к лимиту.";
 "menu_bar_shows_percent_title" = "Строка меню показывает проценты";
@@ -547,12 +541,7 @@
 "multi_account_layout_subtitle" = "Выберите сегментированное переключение аккаунтов или сгруппированные карты аккаунтов.";
 "multi_account_layout_segmented" = "Сегментированный";
 "multi_account_layout_stacked" = "Стопкой";
-"overview_tab_providers_title" = "Провайдеры вкладки «Обзор»";
 "configure" = "Настроить…";
-"overview_enable_merge_icons_hint" = "Включите «Объединять значки», чтобы настроить провайдеров вкладки «Обзор».";
-"overview_no_providers_hint" = "Нет включённых провайдеров для обзора.";
-"overview_rows_follow_order" = "Строки обзора всегда следуют порядку провайдеров.";
-"overview_no_providers_selected" = "Провайдеры не выбраны";
 
 /* Advanced Pane */
 "section_keyboard_shortcut" = "Сочетание клавиш";
@@ -806,7 +795,6 @@
 "Hover a bar for details" = "Наведите на полосу, чтобы увидеть подробности";
 "%@: %@ · %@ tokens" = "%@: %@ · %@ токенов";
 "%@: %@" = "%@: %@";
-"No providers selected for Overview." = "Провайдеры для обзора не выбраны.";
 "No overview data available." = "Обзорные данные отсутствуют.";
 "Auto uses the local IDE API first, then Google OAuth when the IDE is closed." = "Автоматически сначала использует локальный API IDE, затем Google OAuth, когда IDE закрыта.";
 "Login with Google" = "Войти через Google";

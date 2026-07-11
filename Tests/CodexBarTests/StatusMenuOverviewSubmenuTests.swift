@@ -5,7 +5,7 @@ import Testing
 
 extension StatusMenuTests {
     @Test
-    func `overview rows expose provider detail submenus`() throws {
+    func `overview rows expose a hosted-subview submenu recognized by isHostedSubviewMenu`() throws {
         self.disableMenuCardsForTesting()
         let settings = self.makeSettings()
         settings.statusChecksEnabled = false
@@ -56,17 +56,29 @@ extension StatusMenuTests {
         let menu = controller.makeMenu()
         controller.menuWillOpen(menu)
 
+        // Overview rows hover-open a hosted-subview submenu (native NSMenu auto-expand-on-hover)
+        // showing the provider's full detail; there is no click-through navigation.
         let openAIRow = try #require(menu.items.first {
             ($0.representedObject as? String) == "overviewRow-openai"
         })
-        #expect(openAIRow.submenu?.items.contains {
-            ($0.representedObject as? String) == StatusItemController.costHistoryChartID
-        } == true)
+        let submenu = try #require(openAIRow.submenu)
+        #expect(controller.isHostedSubviewMenu(submenu))
+        #expect(openAIRow.action == nil || openAIRow.target === controller)
+        // No tab-bar-like first item: Overview rows are the merged menu's direct top-level content.
+        #expect((menu.items.first?.representedObject as? String)?.hasPrefix("overviewRow-") == true)
     }
 
     @Test
-    func `overview row submenu action does not switch provider detail`() throws {
-        self.disableMenuCardsForTesting()
+    func `hovering an overview row hydrates the provider detail submenu with header and actions`() async throws {
+        let previousMenuCardRendering = StatusItemController.menuCardRenderingEnabled
+        let previousMenuRefresh = StatusItemController.menuRefreshEnabled
+        StatusItemController.menuCardRenderingEnabled = false
+        StatusItemController.setMenuRefreshEnabledForTesting(false)
+        defer {
+            StatusItemController.menuCardRenderingEnabled = previousMenuCardRendering
+            StatusItemController.setMenuRefreshEnabledForTesting(previousMenuRefresh)
+        }
+
         let settings = self.makeSettings()
         settings.statusChecksEnabled = false
         settings.refreshFrequency = .manual
@@ -115,42 +127,38 @@ extension StatusMenuTests {
         let zaiRow = try #require(menu.items.first {
             ($0.representedObject as? String) == "overviewRow-zai"
         })
-        #expect(zaiRow.submenu != nil)
+        let submenu = try #require(zaiRow.submenu)
+        #expect(controller.isHostedSubviewMenu(submenu))
 
-        let action = try #require(zaiRow.action)
-        let target = try #require(zaiRow.target as? StatusItemController)
-        _ = target.perform(action, with: zaiRow)
+        // Hovering the row is what AppKit does before it opens the submenu; the controller
+        // hydrates lazily via menuWillOpen on the submenu itself (mirrors the other hosted
+        // chart submenus, e.g. cost history).
+        controller.menuWillOpen(submenu)
 
-        #expect(settings.mergedMenuLastSelectedWasOverview)
-        #expect(settings.selectedMenuProvider == .claude)
-        #expect(menu.items.contains {
-            ($0.representedObject as? String) == "overviewRow-zai"
-        })
+        // Hydration replaces the single lazy placeholder item with the full detail screen:
+        // header/usage card content plus actionable sections (status page, refresh, etc.).
+        #expect(submenu.items.count > 1)
+        #expect(submenu.items.contains { $0.representedObject as? String == "menuCard" } ||
+            submenu.items.contains { $0.representedObject as? String == "menuCardUsage" } ||
+            submenu.items.contains { $0.representedObject as? String == "menuCardHeader" })
+
+        // The Overview selection state itself never changes just from hovering a submenu — no
+        // click-through navigation exists, so the merged menu's Overview stays the "current" view.
+        #expect(settings.mergedMenuLastSelectedWasOverview == true)
     }
 
     @Test
-    func `selecting overview row defers provider detail rebuild`() async throws {
-        let previousMenuCardRendering = StatusItemController.menuCardRenderingEnabled
-        let previousMenuRefresh = StatusItemController.menuRefreshEnabled
-        StatusItemController.menuCardRenderingEnabled = false
-        StatusItemController.setMenuRefreshEnabledForTesting(true)
-        defer {
-            StatusItemController.menuCardRenderingEnabled = previousMenuCardRendering
-            StatusItemController.setMenuRefreshEnabledForTesting(previousMenuRefresh)
-        }
-
+    func `overview submenu hydration is reachable through appendOverviewProviderDetailItems`() throws {
+        self.disableMenuCardsForTesting()
         let settings = self.makeSettings()
         settings.statusChecksEnabled = false
         settings.refreshFrequency = .manual
         settings.mergeIcons = true
-        settings.selectedMenuProvider = .codex
-        settings.mergedMenuLastSelectedWasOverview = true
 
         let registry = ProviderRegistry.shared
         for provider in UsageProvider.allCases {
             guard let metadata = registry.metadata[provider] else { continue }
-            let shouldEnable = provider == .codex || provider == .cursor
-            settings.setProviderEnabled(provider: provider, metadata: metadata, enabled: shouldEnable)
+            settings.setProviderEnabled(provider: provider, metadata: metadata, enabled: provider == .codex)
         }
 
         let fetcher = UsageFetcher()
@@ -164,110 +172,9 @@ extension StatusMenuTests {
             statusBar: self.makeStatusBarForTesting())
         defer { controller.releaseStatusItemsForTesting() }
 
-        let menu = controller.makeMenu()
-        controller.menuWillOpen(menu)
-        defer { controller.menuDidClose(menu) }
-
-        let cursorRow = try #require(menu.items.first {
-            ($0.representedObject as? String) == "overviewRow-cursor"
-        })
-        var rebuildCount = 0
-        controller._test_openMenuRebuildObserver = { _ in
-            rebuildCount += 1
-        }
-        defer { controller._test_openMenuRebuildObserver = nil }
-
-        let action = try #require(cursorRow.action)
-        let target = try #require(cursorRow.target as? StatusItemController)
-        _ = target.perform(action, with: cursorRow)
-
-        #expect(settings.mergedMenuLastSelectedWasOverview == false)
-        #expect(settings.selectedMenuProvider == .cursor)
-        #expect(rebuildCount == 0)
-        #expect(menu.items.contains {
-            ($0.representedObject as? String)?.hasPrefix("overviewRow-") == true
-        })
-
-        for _ in 0..<100 where rebuildCount == 0 {
-            await Task.yield()
-            try? await Task.sleep(for: .milliseconds(10))
-        }
-
-        let representedIDs = menu.items.compactMap { $0.representedObject as? String }
-        let switcherButtons = (menu.items.first?.view as? ProviderSwitcherView)?.subviews
-            .compactMap { $0 as? NSButton } ?? []
-        #expect(rebuildCount == 1)
-        #expect(representedIDs.contains("menuCard"))
-        #expect(representedIDs.contains(where: { $0.hasPrefix("overviewRow-") }) == false)
-        #expect(switcherButtons.first(where: { $0.state == .on })?.tag == 2)
-    }
-
-    @Test
-    func `overview row action close renders selected provider on next open`() async throws {
-        let previousMenuCardRendering = StatusItemController.menuCardRenderingEnabled
-        let previousMenuRefresh = StatusItemController.menuRefreshEnabled
-        StatusItemController.menuCardRenderingEnabled = false
-        StatusItemController.setMenuRefreshEnabledForTesting(true)
-        defer {
-            StatusItemController.menuCardRenderingEnabled = previousMenuCardRendering
-            StatusItemController.setMenuRefreshEnabledForTesting(previousMenuRefresh)
-        }
-
-        let settings = self.makeSettings()
-        settings.statusChecksEnabled = false
-        settings.refreshFrequency = .manual
-        settings.mergeIcons = true
-        settings.selectedMenuProvider = .codex
-        settings.mergedMenuLastSelectedWasOverview = true
-
-        let registry = ProviderRegistry.shared
-        for provider in UsageProvider.allCases {
-            guard let metadata = registry.metadata[provider] else { continue }
-            let shouldEnable = provider == .codex || provider == .cursor
-            settings.setProviderEnabled(provider: provider, metadata: metadata, enabled: shouldEnable)
-        }
-
-        let fetcher = UsageFetcher()
-        let store = UsageStore(fetcher: fetcher, browserDetection: BrowserDetection(cacheTTL: 0), settings: settings)
-        let controller = StatusItemController(
-            store: store,
-            settings: settings,
-            account: fetcher.loadAccountInfo(),
-            updater: DisabledUpdaterController(),
-            preferencesSelection: PreferencesSelection(),
-            statusBar: self.makeStatusBarForTesting())
-        defer { controller.releaseStatusItemsForTesting() }
-
-        let menu = controller.makeMenu()
-        controller.menuWillOpen(menu)
-
-        let cursorRow = try #require(menu.items.first {
-            ($0.representedObject as? String) == "overviewRow-cursor"
-        })
-        var rebuildCount = 0
-        controller._test_openMenuRebuildObserver = { _ in
-            rebuildCount += 1
-        }
-        defer { controller._test_openMenuRebuildObserver = nil }
-
-        let action = try #require(cursorRow.action)
-        let target = try #require(cursorRow.target as? StatusItemController)
-        _ = target.perform(action, with: cursorRow)
-        controller.menuDidClose(menu)
-
-        await Task.yield()
-        await Task.yield()
-        #expect(rebuildCount == 0)
-        #expect(settings.selectedMenuProvider == .cursor)
-
-        controller.menuWillOpen(menu)
-        defer { controller.menuDidClose(menu) }
-
-        let representedIDs = menu.items.compactMap { $0.representedObject as? String }
-        let switcherButtons = (menu.items.first?.view as? ProviderSwitcherView)?.subviews
-            .compactMap { $0 as? NSButton } ?? []
-        #expect(representedIDs.contains("menuCard"))
-        #expect(representedIDs.contains(where: { $0.hasPrefix("overviewRow-") }) == false)
-        #expect(switcherButtons.first(where: { $0.state == .on })?.tag == 2)
+        let submenu = NSMenu()
+        submenu.autoenablesItems = false
+        _ = controller.appendOverviewProviderDetailItems(to: submenu, provider: .codex, width: 310)
+        #expect(!submenu.items.isEmpty)
     }
 }

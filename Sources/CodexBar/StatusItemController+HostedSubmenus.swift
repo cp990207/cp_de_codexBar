@@ -10,19 +10,21 @@ extension StatusItemController {
         let providerRawValue: String?
     }
 
+    private static let hostedSubviewChartIDs: Set<String> = [
+        StatusItemController.usageBreakdownChartID,
+        StatusItemController.creditsHistoryChartID,
+        StatusItemController.costHistoryChartID,
+        StatusItemController.usageHistoryChartID,
+        StatusItemController.storageBreakdownID,
+        StatusItemController.statusComponentsID,
+        StatusItemController.zaiHourlyUsageChartID,
+        StatusItemController.overviewProviderDetailID,
+    ]
+
     func isHostedSubviewMenu(_ menu: NSMenu) -> Bool {
-        let ids: Set = [
-            Self.usageBreakdownChartID,
-            Self.creditsHistoryChartID,
-            Self.costHistoryChartID,
-            Self.usageHistoryChartID,
-            Self.storageBreakdownID,
-            Self.statusComponentsID,
-            Self.zaiHourlyUsageChartID,
-        ]
-        return menu.items.contains { item in
+        menu.items.contains { item in
             guard let id = item.representedObject as? String else { return false }
-            return ids.contains(id)
+            return Self.hostedSubviewChartIDs.contains(id)
         }
     }
 
@@ -110,6 +112,14 @@ extension StatusItemController {
             } else {
                 false
             }
+        case Self.overviewProviderDetailID:
+            if let providerRawValue = placeholder.toolTip,
+               let provider = UsageProvider(rawValue: providerRawValue)
+            {
+                self.appendOverviewProviderDetailItems(to: menu, provider: provider, width: width)
+            } else {
+                false
+            }
         default:
             false
         }
@@ -178,6 +188,12 @@ extension StatusItemController {
             } else {
                 false
             }
+        case Self.overviewProviderDetailID:
+            if let provider = identity.provider {
+                self.appendOverviewProviderDetailItems(to: menu, provider: provider, width: width)
+            } else {
+                false
+            }
         default:
             false
         }
@@ -195,7 +211,9 @@ extension StatusItemController {
     private func hostedSubviewIdentity(for menu: NSMenu)
     -> HostedSubviewIdentity? {
         for item in menu.items {
-            guard let chartID = item.representedObject as? String else { continue }
+            guard let chartID = item.representedObject as? String,
+                  Self.hostedSubviewChartIDs.contains(chartID)
+            else { continue }
             let providerRawValue = self.hostedSubviewProviderRawValue(for: item)
             return HostedSubviewIdentity(
                 chartID: chartID,
@@ -243,6 +261,8 @@ extension StatusItemController {
             identity.provider.map(self.statusComponentsRenderSignature(for:)) ?? "missing-provider"
         case Self.zaiHourlyUsageChartID:
             identity.provider.map(self.zaiHourlyUsageRenderSignature(for:)) ?? "missing-provider"
+        case Self.overviewProviderDetailID:
+            identity.provider.map(self.overviewProviderDetailRenderSignature(for:)) ?? "missing-provider"
         default:
             "unknown"
         }
@@ -334,6 +354,20 @@ extension StatusItemController {
             modelUsage.xTime.joined(separator: ","),
             models,
             visibleBars.joined(separator: "|"),
+        ].joined(separator: "|")
+    }
+
+    /// Cheap signature covering everything the Overview row's hover-detail submenu renders, so a
+    /// re-open/refresh reconciles when the provider's snapshot or menu content actually changed.
+    private func overviewProviderDetailRenderSignature(for provider: UsageProvider) -> String {
+        let cardSignature = self.menuCardModel(for: provider)?.heightFingerprint(section: "overviewDetail") ?? "none"
+        let descriptorSignature = self.makeMenuDescriptor(provider: provider, includeContextualActions: true)
+            .sections
+            .map { section in section.entries.map(String.init(describing:)).joined(separator: ",") }
+            .joined(separator: ";")
+        return [
+            cardSignature,
+            descriptorSignature,
         ].joined(separator: "|")
     }
 
@@ -603,5 +637,57 @@ extension StatusItemController {
         chartItem.toolTip = provider.rawValue
         submenu.addItem(chartItem)
         return true
+    }
+
+    /// Builds the full provider detail screen (header/usage card, cost history charts, action
+    /// buttons) inside an Overview row's hover submenu — the same content a single-provider menu
+    /// shows, reusing `addPrimaryMenuContent`/`addActionableSections` via `.provider(provider)` so
+    /// the submenu matches what selecting that provider as the sole top-level menu would show.
+    @discardableResult
+    func appendOverviewProviderDetailItems(
+        to submenu: NSMenu,
+        provider: UsageProvider,
+        width: CGFloat) -> Bool
+    {
+        // Unlike the single-view hosted submenus (cost history, credits history, …), this submenu
+        // is filled with real, interactive content whose own items need their `representedObject`
+        // for their own purposes (actions, nested chart IDs). A dedicated hidden marker item carries
+        // the hosted-subview identity instead of overloading a content item, so `isHostedSubviewMenu`
+        // keeps recognizing this submenu after hydration — without it, the parent Overview row gets
+        // rebuilt out from under an open hover submenu, forcing it to close and immediately reopen
+        // (visible as rapid flicker) every time something invalidates the parent menu while hovering.
+        let identityMarker = NSMenuItem()
+        identityMarker.isHidden = true
+        identityMarker.isEnabled = false
+        identityMarker.representedObject = Self.overviewProviderDetailID
+        identityMarker.toolTip = provider.rawValue
+        submenu.addItem(identityMarker)
+
+        let accountDisplays = self.resolvedAccountDisplays(for: provider, isOverviewSelected: false)
+        let openAIContext = self.openAIWebContext(
+            currentProvider: provider,
+            showAllAccounts: accountDisplays.showAllAccounts)
+        let descriptor = self.makeMenuDescriptor(provider: provider, includeContextualActions: true)
+        let menuContext = MenuCardContext(
+            currentProvider: provider,
+            selectedProvider: provider,
+            menuWidth: width,
+            codexAccountDisplay: accountDisplays.codexAccountDisplay,
+            tokenAccountDisplay: accountDisplays.tokenAccountDisplay,
+            openAIContext: openAIContext)
+        self.addCodexAccountSwitcherIfNeeded(
+            to: submenu,
+            display: accountDisplays.codexAccountDisplay,
+            width: width)
+        self.addTokenAccountSwitcherIfNeeded(
+            to: submenu,
+            display: accountDisplays.tokenAccountDisplay,
+            width: width)
+        self.addPrimaryMenuContent(
+            to: submenu,
+            context: menuContext,
+            switcherSelection: .provider(provider))
+        self.addActionableSections(descriptor.sections, to: submenu, width: width)
+        return !submenu.items.isEmpty
     }
 }

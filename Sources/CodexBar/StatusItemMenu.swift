@@ -1,15 +1,9 @@
 import AppKit
 
-enum StatusItemMenuProviderNavigationDirection {
-    case previous
-    case next
-}
-
 protocol StatusItemMenuPersistentActionDelegate: AnyObject {
     func performPersistentRefreshAction(in menuID: ObjectIdentifier)
     func performPersistentSettingsAction()
     func performPersistentQuitAction()
-    func performProviderNavigation(_ direction: StatusItemMenuProviderNavigationDirection)
 }
 
 final class StatusItemMenu: NSMenu {
@@ -25,12 +19,6 @@ final class StatusItemMenu: NSMenu {
             case .quit:
                 self.persistentActionDelegate?.performPersistentQuitAction()
             }
-            return true
-        }
-        if let direction = Self.providerNavigationDirection(for: event),
-           self.items.first?.view is ProviderSwitcherView
-        {
-            self.persistentActionDelegate?.performProviderNavigation(direction)
             return true
         }
 
@@ -63,35 +51,5 @@ final class StatusItemMenu: NSMenu {
         default:
             return nil
         }
-    }
-
-    nonisolated static func providerNavigationDirection(
-        for event: NSEvent) -> StatusItemMenuProviderNavigationDirection?
-    {
-        guard event.type == .keyDown else { return nil }
-        let relevantModifiers = event.modifierFlags.intersection([.command, .option, .control, .shift])
-        guard relevantModifiers.isEmpty else { return nil }
-        switch event.keyCode {
-        case 123:
-            return .previous
-        case 124:
-            return .next
-        default:
-            return nil
-        }
-    }
-
-    nonisolated static func providerSelectionIndex(for event: NSEvent) -> Int? {
-        guard event.type == .keyDown else { return nil }
-        let relevantModifiers = event.modifierFlags.intersection([.command, .option, .control, .shift])
-        guard relevantModifiers == .command,
-              let characters = event.charactersIgnoringModifiers,
-              characters.count == 1,
-              let number = Int(characters),
-              (1...9).contains(number)
-        else {
-            return nil
-        }
-        return number - 1
     }
 }

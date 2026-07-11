@@ -59,9 +59,6 @@
 "Check provider status" = "Controleer de status van de provider";
 "Choose Codex workspace" = "Kies Codex-werkruimte";
 "Choose the MiniMax host (global .io or China mainland .com)." = "Kies de MiniMax-host (global .io of China vasteland .com).";
-"Choose up to " = "Kies tot";
-"Choose up to \\(Self.maxOverviewProviders) providers" = "Kies maximaal \\(Self.maxOverviewProviders) providers";
-"Choose up to \\(count) providers" = "Kies maximaal \\(count) providers";
 "Choose what to show in the menu bar (Pace shows usage vs. expected)." = "Kies wat u wilt weergeven in de menubalk (Tempo toont gebruik vs. verwacht).";
 "Choose which Codex account CodexBar should follow." = "Kies welk Codex-account CodexBar moet volgen.";
 "Choose which window drives the menu bar percent." = "Kies welk venster het menubalkpercentage aanstuurt.";
@@ -383,7 +380,6 @@
 "metric_tertiary" = "Tertiair (%@)";
 "multiple_workspaces_found" = "CodexBar heeft meerdere werkruimten gevonden voor %@. Kies de werkruimte die u wilt toevoegen.";
 "ory_session_…=…; csrftoken=…" = "ory_sessie_…=…; csrftoken=…";
-"overview_choose_providers" = "Kies maximaal %@ providers";
 "remove_account_message" = "%@ verwijderen uit CodexBar? Het beheerde Codex-huis wordt verwijderd.";
 "version_format" = "Versie %@";
 "vertex_ai_login_instructions" = "Om het gebruik van Vertex AI bij te houden, authenticeert u zich met Google Cloud.\n\n1. Open Terminal\n2. Uitvoeren: gcloud auth applicatie-standaard login\n3. Volg de browserprompts om in te loggen\n4. Stel uw project in: gcloud config set project PROJECT_ID\n\nTerminal nu openen?";
@@ -516,9 +512,7 @@
 /* Display Pane */
 "section_menu_bar" = "Menubalk";
 "merge_icons_title" = "Pictogrammen samenvoegen";
-"merge_icons_subtitle" = "Gebruik één menubalkpictogram met een providerwisselaar.";
-"switcher_shows_icons_title" = "Switcher toont pictogrammen";
-"switcher_shows_icons_subtitle" = "Toon providerpictogrammen in de switcher (toon anders een wekelijkse voortgangslijn).";
+"merge_icons_subtitle" = "Gebruik één menubalkpictogram met een overzicht van alle providers.";
 "show_most_used_provider_title" = "Toon meest gebruikte provider";
 "show_most_used_provider_subtitle" = "De menubalk toont automatisch de aanbieder die het dichtst bij de tarieflimiet zit.";
 "menu_bar_shows_percent_title" = "Menubalk toont percentage";
@@ -546,12 +540,7 @@
 "multi_account_layout_subtitle" = "Kies voor gesegmenteerd wisselen tussen accounts of gestapelde accountkaarten.";
 "multi_account_layout_segmented" = "Gesegmenteerd";
 "multi_account_layout_stacked" = "Gestapeld";
-"overview_tab_providers_title" = "Overzicht tabblad aanbieders";
 "configure" = "Configureer…";
-"overview_enable_merge_icons_hint" = "Schakel Pictogrammen samenvoegen in om de providers van tabbladen Overzicht te configureren.";
-"overview_no_providers_hint" = "Er zijn geen ingeschakelde providers beschikbaar voor Overzicht.";
-"overview_rows_follow_order" = "Overzichtsrijen volgen altijd de volgorde van de provider.";
-"overview_no_providers_selected" = "Geen aanbieders geselecteerd";
 
 /* Advanced Pane */
 "section_keyboard_shortcut" = "Sneltoets";
@@ -804,7 +793,6 @@
 "Est. total (%@): %@" = "Geschat. totaal (%@): %@";
 "Hover a bar for details" = "Beweeg een balk voor details";
 "%@: %@ · %@ tokens" = "%@: %@ · %@ tokens";
-"No providers selected for Overview." = "Geen aanbieders geselecteerd voor Overzicht.";
 "No overview data available." = "Geen overzichtsgegevens beschikbaar.";
 "Auto uses the local IDE API first, then Google OAuth when the IDE is closed." = "Auto gebruikt eerst de lokale IDE API en vervolgens Google OAuth wanneer de IDE wordt gesloten.";
 "Login with Google" = "Inloggen met Google";

@@ -45,8 +45,7 @@ extension StatusItemController {
         guard self.shouldMergeIcons else { return false }
         if let mergedMenu = self.mergedMenu, menu !== mergedMenu { return false }
         let providers = self.settings.resolvedMergedOverviewProviders(
-            activeProviders: self.store.enabledProvidersForDisplay(),
-            maxVisibleProviders: SettingsStore.mergedOverviewProviderLimit)
+            activeProviders: self.store.enabledProvidersForDisplay())
         return !providers.isEmpty && self.settings.mergedMenuLastSelectedWasOverview
     }
 }

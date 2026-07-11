@@ -10,29 +10,9 @@ extension StatusItemController {
         ].joined(separator: "|")
     }
 
-    func rememberMergedSwitcherState(_ providers: [UsageProvider], _ selection: ProviderSwitcherSelection?) {
-        self.rememberMergedSwitcherState(
-            providers,
-            selection,
-            self.includesOverviewTab(for: providers))
-    }
-
-    func rememberMergedSwitcherState(
-        _ providers: [UsageProvider],
-        _ selection: ProviderSwitcherSelection?,
-        _ includesOverview: Bool)
-    {
-        self.lastSwitcherProviders = providers
-        self.lastSwitcherUsageBarsShowUsed = self.settings.usageBarsShowUsed
-        self.lastMergedSwitcherSelection = selection
-        self.lastMergedMenuContentSelection = selection
-        self.lastSwitcherIncludesOverview = includesOverview
+    /// Records the localization signature the menu was just rebuilt with, so later settings-change
+    /// checks (`handleSettingsChange`) can detect an app-language change and force a full rebuild.
+    func rememberMenuLocalizationSignature() {
         self.lastMenuLocalizationSignature = self.menuLocalizationSignature()
-    }
-
-    private func includesOverviewTab(for providers: [UsageProvider]) -> Bool {
-        !self.settings.resolvedMergedOverviewProviders(
-            activeProviders: providers,
-            maxVisibleProviders: SettingsStore.mergedOverviewProviderLimit).isEmpty
     }
 }

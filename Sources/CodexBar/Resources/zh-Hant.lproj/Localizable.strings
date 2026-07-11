@@ -63,9 +63,6 @@
 "Check provider status" = "檢查提供者狀態";
 "Choose Codex workspace" = "選擇 Codex 工作區";
 "Choose the MiniMax host (global .io or China mainland .com)." = "選擇 MiniMax 主機（全球 .io 或中國大陸 .com）。";
-"Choose up to " = "選擇最多 ";
-"Choose up to \\(Self.maxOverviewProviders) providers" = "選擇最多 \\(Self.maxOverviewProviders) 個提供者";
-"Choose up to \\(count) providers" = "選擇最多 \\(count) 個提供者";
 "Choose what to show in the menu bar (Pace shows usage vs. expected)." = "選擇選單列要顯示的內容（進度會比較目前用量和時間進度）。";
 "Choose which Codex account CodexBar should follow." = "選擇 CodexBar 要追蹤的 Codex 帳號。";
 "Choose which window drives the menu bar percent." = "選擇選單列百分比要依據哪個時段。";
@@ -394,7 +391,6 @@
 "metric_tertiary" = "第三（%@）";
 "multiple_workspaces_found" = "CodexBar 發現 %@ 有多個工作區。請選擇要新增的工作區。";
 "ory_session_…=…; csrftoken=…" = "ory_session_…=…; csrftoken=…";
-"overview_choose_providers" = "最多選擇 %@ 個提供者";
 "remove_account_message" = "要從 CodexBar 中移除 %@ 嗎？其託管的 Codex 主目錄將被刪除。";
 "version_format" = "版本 %@";
 "workspaceID is set but only opencode, opencodego, and deepgram support workspaceID." = "已設定 workspaceID，但只有 opencode、opencodego 和 deepgram 支援 workspaceID。";
@@ -515,9 +511,7 @@
 "primary_api_key_limit" = "主要（API 金鑰限制）";
 "section_menu_bar" = "選單列";
 "merge_icons_title" = "合併圖示";
-"merge_icons_subtitle" = "使用單一選單列圖示，並提供提供者切換器。";
-"switcher_shows_icons_title" = "切換器顯示圖示";
-"switcher_shows_icons_subtitle" = "在切換器中顯示提供者圖示（否則顯示每週進度線）。";
+"merge_icons_subtitle" = "使用單一選單列圖示，顯示所有提供者的總覽。";
 "show_most_used_provider_title" = "顯示使用量最高的提供者";
 "show_most_used_provider_subtitle" = "選單列會自動顯示最接近用量上限的提供者。";
 "menu_bar_shows_percent_title" = "選單列顯示百分比";
@@ -545,12 +539,7 @@
 "multi_account_layout_subtitle" = "選擇分段帳號切換或堆疊帳號卡片。";
 "multi_account_layout_segmented" = "分段";
 "multi_account_layout_stacked" = "堆疊";
-"overview_tab_providers_title" = "概覽標籤提供者";
 "configure" = "設定…";
-"overview_enable_merge_icons_hint" = "啟用「合併圖示」以設定「概覽」標籤中的提供者。";
-"overview_no_providers_hint" = "「概覽」中沒有可用的已啟用提供者。";
-"overview_rows_follow_order" = "概覽列一律依提供者順序排列。";
-"overview_no_providers_selected" = "未選擇提供者";
 "section_keyboard_shortcut" = "快速鍵";
 "open_menu_shortcut_title" = "開啟選單";
 "open_menu_shortcut_subtitle" = "從任意位置觸發選單列選單。";
@@ -806,7 +795,6 @@
 "Hover a bar for details" = "停留在長條上查看詳細資料";
 "%@: %@ · %@ tokens" = "%@：%@ · %@ token";
 "%@: %@" = "%@：%@";
-"No providers selected for Overview." = "概覽尚未選擇提供者。";
 "No overview data available." = "概覽尚無可用資料。";
 
 /* Additional provider settings and alerts */

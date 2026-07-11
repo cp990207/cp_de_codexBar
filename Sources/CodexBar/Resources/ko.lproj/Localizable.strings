@@ -59,9 +59,6 @@
 "Check provider status" = "공급자 상태 확인";
 "Choose Codex workspace" = "Codex 작업 공간 선택";
 "Choose the MiniMax host (global .io or China mainland .com)." = "MiniMax 호스트를 선택하세요 (글로벌 .io 또는 중국 본토 .com).";
-"Choose up to " = "최대 선택 ";
-"Choose up to \\(Self.maxOverviewProviders) providers" = "최대 \\(Self.maxOverviewProviders)개 공급자 선택";
-"Choose up to \\(count) providers" = "최대 \\(count)개 공급자 선택";
 "Choose what to show in the menu bar (Pace shows usage vs. expected)." = "메뉴 막대에 표시할 항목을 선택하세요 (사용 속도는 예상 대비 사용량을 표시).";
 "Choose which Codex account CodexBar should follow." = "CodexBar가 따를 Codex 계정을 선택하세요.";
 "Choose which window drives the menu bar percent." = "메뉴 막대 백분율을 결정하는 기간을 선택하세요.";
@@ -383,7 +380,6 @@
 "metric_tertiary" = "3차 (%@)";
 "multiple_workspaces_found" = "CodexBar가 %@에 대한 여러 작업 공간을 찾았습니다. 추가할 작업 공간을 선택하세요.";
 "ory_session_…=…; csrftoken=…" = "ory_session_…=…; csrftoken=…";
-"overview_choose_providers" = "최대 %@개의 공급자 선택";
 "remove_account_message" = "CodexBar에서 %@을(를) 제거하시겠습니까? 관리형 Codex 홈이 삭제됩니다.";
 "version_format" = "버전 %@";
 "vertex_ai_login_instructions" = "Vertex AI 사용량을 추적하려면 Google Cloud로 인증하세요.\n\n1. 터미널 열기\n2. 실행: gcloud auth application-default login\n3. 브라우저 안내에 따라 로그인\n4. 프로젝트 설정: gcloud config set project PROJECT_ID\n\n지금 터미널을 여시겠습니까?";
@@ -505,9 +501,7 @@
 "primary_api_key_limit" = "기본 (API 키 한도)";
 "section_menu_bar" = "메뉴 막대";
 "merge_icons_title" = "아이콘 병합";
-"merge_icons_subtitle" = "공급자 전환기가 있는 단일 메뉴 막대 아이콘을 사용합니다.";
-"switcher_shows_icons_title" = "전환기에 아이콘 표시";
-"switcher_shows_icons_subtitle" = "전환기에 공급자 아이콘을 표시합니다(그렇지 않으면 주간 진행률 선을 표시).";
+"merge_icons_subtitle" = "모든 공급자의 개요가 표시되는 단일 메뉴 막대 아이콘을 사용합니다.";
 "show_most_used_provider_title" = "가장 많이 사용한 공급자 표시";
 "show_most_used_provider_subtitle" = "메뉴 막대에 사용 한도에 가장 가까운 공급자를 자동으로 표시합니다.";
 "menu_bar_shows_percent_title" = "메뉴 막대에 백분율 표시";
@@ -535,12 +529,7 @@
 "multi_account_layout_subtitle" = "분할된 계정 전환 또는 쌓인 계정 카드를 선택하세요.";
 "multi_account_layout_segmented" = "분할";
 "multi_account_layout_stacked" = "쌓기";
-"overview_tab_providers_title" = "개요 탭 공급자";
 "configure" = "구성…";
-"overview_enable_merge_icons_hint" = "개요 탭 공급자를 구성하려면 아이콘 병합을 사용하세요.";
-"overview_no_providers_hint" = "개요에 사용할 수 있는 활성화된 공급자가 없습니다.";
-"overview_rows_follow_order" = "개요 행은 항상 공급자 순서를 따릅니다.";
-"overview_no_providers_selected" = "선택된 공급자 없음";
 "section_keyboard_shortcut" = "키보드 단축키";
 "open_menu_shortcut_title" = "메뉴 열기";
 "open_menu_shortcut_subtitle" = "어디서나 메뉴 막대 메뉴를 실행합니다.";
@@ -774,7 +763,6 @@
 "Est. total (%@): %@" = "예상 합계(%@): %@";
 "Hover a bar for details" = "막대에 마우스를 올리면 세부 정보 표시";
 "%@: %@ · %@ tokens" = "%@: %@ · 토큰 %@개";
-"No providers selected for Overview." = "개요에 선택된 공급자가 없습니다.";
 "No overview data available." = "개요 데이터가 없습니다.";
 "Auto uses the local IDE API first, then Google OAuth when the IDE is closed." = "자동 모드는 로컬 IDE API를 먼저 사용하고, IDE가 닫혀 있으면 Google OAuth를 사용합니다.";
 "Login with Google" = "Google로 로그인";

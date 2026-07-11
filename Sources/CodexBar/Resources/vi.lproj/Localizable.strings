@@ -59,9 +59,6 @@
 "Check provider status" = "Kiểm tra Nhà cung cấp trạng thái";
 "Choose Codex workspace" = "Chọn không gian làm việc Codex";
 "Choose the MiniMax host (global .io or China mainland .com)." = "Chọn máy chủ MiniMax (toàn cầu .io hoặc Trung Quốc đại lục .com).";
-"Choose up to " = "Chọn tối đa";
-"Choose up to \\(Self.maxOverviewProviders) providers" = "Chọn tối đa nhà cung cấp \\(Self.maxOverviewProviders)";
-"Choose up to \\(count) providers" = "Chọn tối đa \\(count) nhà cung cấp";
 "Choose what to show in the menu bar (Pace shows usage vs. expected)." = "Chọn nội dung sẽ hiển thị trong thanh menu (Tốc độ hiển thị Mức sử dụng so với dự kiến).";
 "Choose which Codex account CodexBar should follow." = "Chọn tài khoản Codex mà CodexBar sẽ tuân theo.";
 "Choose which window drives the menu bar percent." = "Chọn cửa sổ nào điều khiển phần trăm thanh menu.";
@@ -383,7 +380,6 @@
 "metric_tertiary" = "Cấp ba ( %@ )";
 "multiple_workspaces_found" = "CodexBar đã tìm thấy nhiều không gian làm việc cho %@ . Vui lòng chọn không gian làm việc để thêm.";
 "ory_session_…=…; csrftoken=…" = "ory_session_…=…; csrftoken=…";
-"overview_choose_providers" = "Chọn tối đa %@ nhà cung cấp";
 "remove_account_message" = "Xóa %@ khỏi CodexBar ? Trang chủ Codex được quản lý của nó sẽ bị xóa.";
 "version_format" = "Phiên bản %@";
 "vertex_ai_login_instructions" = "Để theo dõi Vertex AI Mức sử dụng , hãy xác thực bằng Google Cloud.\n\n1. Mở Terminal\n2. Chạy: gcloud auth application-default login\n3. Làm theo lời nhắc của trình duyệt để đăng nhập\n4. Đặt dự án của bạn: gcloud config set project PROJECT_ID\n\nMở Thiết bị đầu cuối bây giờ?";
@@ -512,9 +508,7 @@
 /* Display Pane */
 "section_menu_bar" = "thanh menu";
 "merge_icons_title" = "Hợp nhất các biểu tượng";
-"merge_icons_subtitle" = "Sử dụng một biểu tượng thanh menu duy nhất với trình chuyển đổi Nhà cung cấp.";
-"switcher_shows_icons_title" = "Trình chuyển đổi hiển thị các biểu tượng";
-"switcher_shows_icons_subtitle" = "Hiển thị các biểu tượng Nhà cung cấp trong trình chuyển đổi (nếu không thì hiển thị dòng tiến trình hàng tuần).";
+"merge_icons_subtitle" = "Sử dụng một biểu tượng thanh menu duy nhất hiển thị tổng quan tất cả nhà cung cấp.";
 "show_most_used_provider_title" = "Hiển thị Nhà cung cấp";
 "show_most_used_provider_subtitle" = "thanh menu được sử dụng nhiều nhất tự động hiển thị Nhà cung cấp gần nhất với giới hạn tốc độ của nó.";
 "menu_bar_shows_percent_title" = "thanh menu hiển thị phần trăm";
@@ -542,12 +536,7 @@
 "multi_account_layout_subtitle" = "Chọn thẻ tài khoản chuyển đổi phân đoạn hoặc thẻ tài khoản xếp chồng.";
 "multi_account_layout_segmented" = "Được phân đoạn";
 "multi_account_layout_stacked" = "Xếp chồng";
-"overview_tab_providers_title" = "Nhà cung cấp tab tổng quan";
 "configure" = "Định cấu hình…";
-"overview_enable_merge_icons_hint" = "Bật Hợp nhất Biểu tượng để định cấu hình nhà cung cấp tab Tổng quan.";
-"overview_no_providers_hint" = "Không có nhà cung cấp nào được bật cho phần Tổng quan.";
-"overview_rows_follow_order" = "Các hàng tổng quan luôn tuân theo thứ tự Nhà cung cấp.";
-"overview_no_providers_selected" = "Không có nhà cung cấp nào được chọn";
 
 /* Advanced Pane */
 "section_keyboard_shortcut" = "Phím tắt";
@@ -800,7 +789,6 @@
 "Est. total (%@): %@" = "Ước tính tổng ( %@ ): %@";
 "Hover a bar for details" = "Di chuột qua thanh để biết thông tin chi tiết";
 "%@: %@ · %@ tokens" = "%@ : %@ · %@ mã thông báo";
-"No providers selected for Overview." = "Không có nhà cung cấp nào được chọn cho Tổng quan.";
 "No overview data available." = "Không có dữ liệu tổng quan.";
 "Auto uses the local IDE API first, then Google OAuth when the IDE is closed." = "Tự động sử dụng IDE cục bộ API trước, sau đó là Google OAuth khi IDE đóng.";
 "Login with Google" = "Đăng nhập bằng Google";

@@ -1,3 +1,4 @@
+import CodexBarCore
 import Foundation
 
 extension UsageMenuCardView.Model {
@@ -31,6 +32,27 @@ extension UsageMenuCardView.Model {
 
     static func heightFingerprintField(_ name: String, _ value: String?) -> String {
         MenuCardHeightFingerprint.field(name, value)
+    }
+}
+
+enum MenuCardHeightFingerprintBuilder {
+    /// Fingerprint for an Overview row. Rows now span a variable number of lines: a header line
+    /// plus one additional progress-bar line per quota metric (metrics with `statusText` render
+    /// inline on the header instead and add no extra line). The fingerprint must reflect each
+    /// metric's shape — not just its exact text — so a metric flipping between "has statusText"
+    /// and "has percent" (which changes line count) invalidates the cached height.
+    static func overviewRow(
+        provider: UsageProvider,
+        name: String,
+        metrics: [UsageMenuCardView.Model.Metric]) -> String
+    {
+        MenuCardHeightFingerprint.join([
+            "section=overview-compact",
+            "provider=\(provider.rawValue)",
+            "localization=\(codexBarLocalizationSignature())",
+            MenuCardHeightFingerprint.field("name", name),
+            "metrics=\(MenuCardHeightFingerprint.join(metrics.map(\.heightFingerprint)))",
+        ])
     }
 }
 

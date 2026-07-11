@@ -170,8 +170,6 @@ final class StatusItemController: NSObject, NSMenuDelegate, StatusItemControllin
     var highlightedMenuItems: [ObjectIdentifier: NSMenuItem] = [:]
     var providerSwitcherShortcutEventMonitor: ProviderSwitcherShortcutEventMonitor?
     var providerSwitcherShortcutMenuID: ObjectIdentifier?
-    var providerSwitcherPointerInteractionMenuID: ObjectIdentifier?
-    var pendingProviderSwitcherPointerRebuild: PendingProviderSwitcherRebuild?
     var overviewScrollAccumulatedDelta: CGFloat = 0
     var overviewScrollNavigationHandlerForTesting: ((OverviewScrollStep) -> Void)?
     var hasPreparedForAppShutdown = false
@@ -240,41 +238,23 @@ final class StatusItemController: NSObject, NSMenuDelegate, StatusItemControllin
     private var lastConfigRevision: Int
     private var lastProviderOrder: [UsageProvider]
     private var lastMergeIcons: Bool
-    private var lastSwitcherShowsIcons: Bool
     private var lastObservedUsageBarsShowUsed: Bool
     var lastWidgetDisplaySettingsSignature = ""
     private var lastAgentSessionsEnabled: Bool
     private var lastAgentSessionsManualHosts: String
-    /// Tracks which `usageBarsShowUsed` mode the provider switcher was built with.
-    /// Used to decide whether we can "smart update" menu content without rebuilding the switcher.
-    var lastSwitcherUsageBarsShowUsed: Bool
-    /// Tracks whether the merged-menu switcher was built with the Overview tab visible.
-    /// Used to force switcher rebuilds when Overview availability toggles.
-    var lastSwitcherIncludesOverview: Bool = false
     /// Tracks localization-sensitive labels used by the merged menu.
     /// Used to force menu rebuilds when app language changes.
     var lastMenuLocalizationSignature: String = ""
-    /// Tracks which providers the merged menu's switcher was built with, to detect when it needs full rebuild.
-    var lastSwitcherProviders: [UsageProvider] = []
-    /// Tracks which switcher tab state was used for the current merged-menu switcher instance.
-    var lastMergedSwitcherSelection: ProviderSwitcherSelection?
-    /// Tracks which provider/overview content is currently attached below the merged-menu switcher.
-    var lastMergedMenuContentSelection: ProviderSwitcherSelection?
     /// Tracks the visible Codex account switcher contents for merged-menu smart updates.
     var lastCodexAccountMenuDisplay: CodexAccountMenuDisplay?
     /// Tracks the visible token account switcher contents for merged-menu smart updates.
     var lastTokenAccountMenuDisplay: TokenAccountMenuDisplay?
-    /// Keeps detached merged-menu tab content reusable while the same menu remains open.
-    var mergedSwitcherContentCaches: [ObjectIdentifier: [ProviderSwitcherSelection: CachedMergedSwitcherMenuContent]]
-        = [:]
-    var preservesMergedSwitcherContentCachesDuringInvalidation = false
     /// Card hosting views harvested from items about to be discarded by the current populate
     /// pass, keyed by card identifier; consumed by `makeMenuCardItem` and cleared when the
     /// pass finishes. Never outlives a single synchronous menu population.
     var menuCardViewRecyclePool: [String: NSView] = [:]
     /// Monotonic token used to ignore stale deferred provider-switcher menu rebuilds.
     var providerSwitcherUpdateToken = 0
-    var providerSelectionUIRefreshTask: Task<Void, Never>?
     var deferredMergedIconRenderAfterTracking = false
     var lastAppliedMergedIconRenderSignature: String?
     var lastAppliedProviderIconRenderSignatures: [UsageProvider: String] = [:]
@@ -388,11 +368,9 @@ final class StatusItemController: NSObject, NSMenuDelegate, StatusItemControllin
         self.lastConfigRevision = settings.configRevision
         self.lastProviderOrder = settings.providerOrder
         self.lastMergeIcons = settings.mergeIcons
-        self.lastSwitcherShowsIcons = settings.switcherShowsIcons
         self.lastObservedUsageBarsShowUsed = settings.usageBarsShowUsed
         self.lastAgentSessionsEnabled = settings.agentSessionsEnabled
         self.lastAgentSessionsManualHosts = settings.agentSessionsManualHosts
-        self.lastSwitcherUsageBarsShowUsed = settings.usageBarsShowUsed
         self.menuCardRenderingEnabledForController = menuCardRenderingEnabled
         self.menuRefreshEnabledForController = menuRefreshEnabled
         let repairedStatusItemVisibilityKeys = MenuBarStatusItemDefaultsRepair
@@ -637,11 +615,6 @@ final class StatusItemController: NSObject, NSMenuDelegate, StatusItemControllin
         let mergeIcons = self.settings.mergeIcons
         if mergeIcons != self.lastMergeIcons {
             self.lastMergeIcons = mergeIcons
-            shouldRefresh = true
-        }
-        let showsIcons = self.settings.switcherShowsIcons
-        if showsIcons != self.lastSwitcherShowsIcons {
-            self.lastSwitcherShowsIcons = showsIcons
             shouldRefresh = true
         }
         let usageBarsShowUsed = self.settings.usageBarsShowUsed
@@ -892,7 +865,6 @@ final class StatusItemController: NSObject, NSMenuDelegate, StatusItemControllin
             if menuID == self.providerSwitcherShortcutMenuID {
                 self.removeProviderSwitcherShortcutMonitor()
             }
-            self.clearMergedSwitcherContentCache(for: menu)
             self.removeMenuLifecycleState(menuID)
         }
 

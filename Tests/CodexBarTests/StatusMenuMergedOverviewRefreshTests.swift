@@ -7,13 +7,12 @@ import Testing
 @Suite(.serialized)
 struct StatusMenuMergedOverviewRefreshTests {
     @Test
-    func `overview stays busy for an omitted provider refresh`() async throws {
+    func `overview stays busy while a visible provider refreshes`() async throws {
         let settings = self.makeSettings()
         settings.refreshFrequency = .manual
         settings.mergeIcons = true
         let activeProviders: Set<UsageProvider> = [.claude, .codex, .cursor, .opencode]
         self.enableOnly(activeProviders, settings: settings)
-        settings.mergedOverviewSelectedProviders = [.claude, .codex, .cursor]
         settings.mergedMenuLastSelectedWasOverview = true
 
         let controller = self.makeController(settings: settings)
@@ -22,9 +21,10 @@ struct StatusMenuMergedOverviewRefreshTests {
         controller.menuWillOpen(menu)
         defer { controller.menuDidClose(menu) }
 
+        // Every enabled provider is now visible in the overview (no subset).
         let visibleProviders = settings.resolvedMergedOverviewProviders(
             activeProviders: controller.store.enabledProvidersForDisplay())
-        #expect(!visibleProviders.contains(.opencode))
+        #expect(visibleProviders.contains(.opencode))
 
         controller.store.refreshingProviders.insert(.opencode)
         controller.updatePersistentRefreshItemsEnabled()

@@ -176,7 +176,6 @@ enum CodexAccountMenuProjectionRevalidationResult: Equatable {
 @Observable
 final class SettingsStore {
     static let sharedDefaults = AppGroupSupport.sharedDefaults()
-    static let mergedOverviewProviderLimit = 3
     static let productionCodexAccountReconciliationSnapshotCacheInterval: TimeInterval = 2
     static let isRunningTests: Bool = {
         let env = ProcessInfo.processInfo.environment
@@ -464,11 +463,8 @@ extension SettingsStore {
         }
         let jetbrainsIDEBasePath = userDefaults.string(forKey: "jetbrainsIDEBasePath") ?? ""
         let mergeIcons = userDefaults.object(forKey: "mergeIcons") as? Bool ?? true
-        let switcherShowsIcons = userDefaults.object(forKey: "switcherShowsIcons") as? Bool ?? true
         let mergedMenuLastSelectedWasOverview = userDefaults.object(
             forKey: "mergedMenuLastSelectedWasOverview") as? Bool ?? false
-        let mergedOverviewSelectedProvidersRaw = userDefaults.array(
-            forKey: "mergedOverviewSelectedProviders") as? [String] ?? []
         let selectedMenuProviderRaw = userDefaults.string(forKey: "selectedMenuProvider")
         let providerDetectionCompleted = userDefaults.object(forKey: "providerDetectionCompleted") as? Bool ?? false
         let providersSortedAlphabetically = userDefaults.object(
@@ -531,9 +527,7 @@ extension SettingsStore {
             providerStorageFootprintsEnabled: providerStorageFootprintsEnabled,
             jetbrainsIDEBasePath: jetbrainsIDEBasePath,
             mergeIcons: mergeIcons,
-            switcherShowsIcons: switcherShowsIcons,
             mergedMenuLastSelectedWasOverview: mergedMenuLastSelectedWasOverview,
-            mergedOverviewSelectedProvidersRaw: mergedOverviewSelectedProvidersRaw,
             selectedMenuProviderRaw: selectedMenuProviderRaw,
             providerDetectionCompleted: providerDetectionCompleted,
             providersSortedAlphabetically: providersSortedAlphabetically,

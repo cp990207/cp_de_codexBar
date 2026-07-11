@@ -59,9 +59,6 @@
 "Check provider status" = "Kontrollera leverantörsstatus";
 "Choose Codex workspace" = "Välj Codex-arbetsyta";
 "Choose the MiniMax host (global .io or China mainland .com)." = "Välj MiniMax-värd (global .io eller Fastlandskina .com).";
-"Choose up to " = "Välj upp till ";
-"Choose up to \\(Self.maxOverviewProviders) providers" = "Välj upp till \\(Self.maxOverviewProviders) leverantörer";
-"Choose up to \\(count) providers" = "Välj upp till \\(count) leverantörer";
 "Choose what to show in the menu bar (Pace shows usage vs. expected)." = "Välj vad som ska visas i menyraden (takt visar användning mot förväntat).";
 "Choose which Codex account CodexBar should follow." = "Välj vilket Codex-konto CodexBar ska följa.";
 "Choose which window drives the menu bar percent." = "Välj vilket fönster som styr procenttalet i menyraden.";
@@ -384,7 +381,6 @@
 "metric_tertiary" = "Tertiär (%@)";
 "multiple_workspaces_found" = "CodexBar hittade flera arbetsytor för %@. Välj arbetsytan som ska läggas till.";
 "ory_session_…=…; csrftoken=…" = "ory_session_…=…; csrftoken=…";
-"overview_choose_providers" = "Välj upp till %@ leverantörer";
 "remove_account_message" = "Ta bort %@ från CodexBar? Dess hanterade Codex-hem tas bort.";
 "version_format" = "Version %@";
 "vertex_ai_login_instructions" = "Autentisera med Google Cloud för att följa Vertex AI-användning.\n\n1. Öppna Terminal\n2. Kör: gcloud auth application-default login\n3. Följ anvisningarna i webbläsaren för att logga in\n4. Ange ditt projekt: gcloud config set project PROJECT_ID\n\nÖppna Terminal nu?";
@@ -515,9 +511,7 @@
 /* Display Pane */
 "section_menu_bar" = "Menyrad";
 "merge_icons_title" = "Slå ihop ikoner";
-"merge_icons_subtitle" = "Använd en enda menyradsikon med leverantörsväxlare.";
-"switcher_shows_icons_title" = "Växlaren visar ikoner";
-"switcher_shows_icons_subtitle" = "Visa leverantörsikoner i växlaren (annars visas en veckoförloppslinje).";
+"merge_icons_subtitle" = "Använd en enda menyradsikon med en översikt över alla leverantörer.";
 "show_most_used_provider_title" = "Visa mest använda leverantör";
 "show_most_used_provider_subtitle" = "Menyraden visar automatiskt leverantören som ligger närmast sin gräns.";
 "menu_bar_shows_percent_title" = "Menyraden visar procent";
@@ -545,12 +539,7 @@
 "multi_account_layout_subtitle" = "Välj segmenterad kontoväxling eller staplade kontokort.";
 "multi_account_layout_segmented" = "Segmenterad";
 "multi_account_layout_stacked" = "Staplad";
-"overview_tab_providers_title" = "Leverantörer på översiktsfliken";
 "configure" = "Konfigurera…";
-"overview_enable_merge_icons_hint" = "Aktivera Slå ihop ikoner för att konfigurera leverantörer på översiktsfliken.";
-"overview_no_providers_hint" = "Inga aktiverade leverantörer är tillgängliga för översikten.";
-"overview_rows_follow_order" = "Översiktsrader följer alltid leverantörsordningen.";
-"overview_no_providers_selected" = "Inga leverantörer valda";
 
 /* Advanced Pane */
 "section_keyboard_shortcut" = "Kortkommando";
@@ -803,7 +792,6 @@
 "Est. total (%@): %@" = "Uppsk. totalt (%@): %@";
 "Hover a bar for details" = "Håll pekaren över en stapel för detaljer";
 "%@: %@ · %@ tokens" = "%@: %@ · %@ token";
-"No providers selected for Overview." = "Inga leverantörer valda för översikten.";
 "No overview data available." = "Inga översiktsdata tillgängliga.";
 "Auto uses the local IDE API first, then Google OAuth when the IDE is closed." = "Auto använder det lokala IDE-API:t först och sedan Google OAuth när IDE:n är stängd.";
 "Login with Google" = "Logga in med Google";

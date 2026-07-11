@@ -324,16 +324,10 @@ struct MiMoProviderTests {
 
         #expect(balanceIcon.primary == nil)
         #expect(balanceIcon.secondary == nil)
-        #expect(StatusItemController.switcherWeeklyMetricPercent(
-            for: .mimo,
-            snapshot: balanceOnly,
-            showUsed: false) == nil)
+        #expect(balanceOnly.switcherWeeklyWindow(for: .mimo, showUsed: false)?.remainingPercent == nil)
         #expect(planIcon.primary == 90)
         #expect(planIcon.secondary == nil)
-        #expect(StatusItemController.switcherWeeklyMetricPercent(
-            for: .mimo,
-            snapshot: withPlan,
-            showUsed: false) == 90)
+        #expect(withPlan.switcherWeeklyWindow(for: .mimo, showUsed: false)?.remainingPercent == 90)
     }
 
     @Test
