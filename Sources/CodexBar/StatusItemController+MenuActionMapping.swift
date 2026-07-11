@@ -6,8 +6,8 @@ extension StatusItemController {
         case .installUpdate: (#selector(self.installUpdate), nil)
         case .refresh: (#selector(self.refreshMenuItem(_:)), nil)
         case .refreshAugmentSession: (#selector(self.refreshAugmentSession), nil)
-        case .dashboard: (#selector(self.openDashboard), nil)
-        case .statusPage: (#selector(self.openStatusPage), nil)
+        case .dashboard: (#selector(self.openDashboardFromMenuItem(_:)), nil)
+        case .statusPage: (#selector(self.openStatusPageFromMenuItem(_:)), nil)
         case .changelog: (#selector(self.openChangelog), nil)
         case .addCodexAccount: (#selector(self.addManagedCodexAccountFromMenu(_:)), nil)
         case let .addProviderAccount(provider): (#selector(self.runSwitchAccount(_:)), provider.rawValue)
@@ -20,8 +20,6 @@ extension StatusItemController {
         case .about: (#selector(self.showSettingsAbout), nil)
         case .quit: (#selector(self.quit), nil)
         case let .copyError(message): (#selector(self.copyError(_:)), message)
-        case let .focusAgentSession(session, remoteHost):
-            (#selector(self.focusAgentSession(_:)), [session.id, remoteHost ?? ""])
         }
     }
 

@@ -470,8 +470,7 @@ extension SettingsStore {
         let providersSortedAlphabetically = userDefaults.object(
             forKey: "providersSortedAlphabetically") as? Bool ?? false
         let appLanguageRaw = userDefaults.string(forKey: "appLanguage")
-        let agentSessionsEnabled = userDefaults.object(forKey: "agentSessionsEnabled") as? Bool ?? true
-        let agentSessionsManualHosts = userDefaults.string(forKey: "agentSessionsManualHosts") ?? ""
+        let terminalAppRaw = userDefaults.string(forKey: "terminalApp")
         return SettingsDefaultsState(
             refreshFrequency: refreshFrequency,
             refreshAllProvidersOnMenuOpen: refreshAllProvidersOnMenuOpen,
@@ -532,9 +531,7 @@ extension SettingsStore {
             providerDetectionCompleted: providerDetectionCompleted,
             providersSortedAlphabetically: providersSortedAlphabetically,
             appLanguageRaw: appLanguageRaw,
-            terminalAppRaw: userDefaults.string(forKey: "terminalApp"),
-            agentSessionsEnabled: agentSessionsEnabled,
-            agentSessionsManualHosts: agentSessionsManualHosts)
+            terminalAppRaw: terminalAppRaw)
     }
 
     private static func loadNotificationDefaults(userDefaults: UserDefaults) -> NotificationDefaults {

@@ -109,26 +109,6 @@ extension CodexBarCLI {
         """
     }
 
-    static func sessionsHelp(version: String) -> String {
-        """
-        CodexBar \(version)
-
-        Usage:
-          codexbar sessions [--json] [--pretty]
-          codexbar sessions focus <id>
-
-        Description:
-          List live local Codex and Claude Code agent sessions.
-          JSON uses stable AgentSession field names and ISO-8601 dates.
-          Focus activates the owning terminal or desktop app on macOS.
-
-        Examples:
-          codexbar sessions
-          codexbar sessions --json
-          codexbar sessions focus 019f3497-73bf-7df3-a173-4f67d968914a
-        """
-    }
-
     static func serveHelp(version: String) -> String {
         """
         CodexBar \(version)

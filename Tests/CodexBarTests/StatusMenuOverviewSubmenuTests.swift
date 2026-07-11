@@ -69,7 +69,7 @@ extension StatusMenuTests {
     }
 
     @Test
-    func `hovering an overview row hydrates the provider detail submenu with header and actions`() async throws {
+    func `hovering an overview row hydrates the provider detail submenu with header and actions`() throws {
         let previousMenuCardRendering = StatusItemController.menuCardRenderingEnabled
         let previousMenuRefresh = StatusItemController.menuRefreshEnabled
         StatusItemController.menuCardRenderingEnabled = false
@@ -148,7 +148,45 @@ extension StatusMenuTests {
     }
 
     @Test
-    func `overview submenu hydration is reachable through appendOverviewProviderDetailItems`() throws {
+    func `overview submenu tags dashboard and status actions with the hovered provider`() throws {
+        self.disableMenuCardsForTesting()
+        let settings = self.makeSettings()
+        settings.statusChecksEnabled = false
+        settings.refreshFrequency = .manual
+        settings.mergeIcons = true
+
+        let registry = ProviderRegistry.shared
+        for provider in UsageProvider.allCases {
+            guard let metadata = registry.metadata[provider] else { continue }
+            settings.setProviderEnabled(provider: provider, metadata: metadata, enabled: provider == .deepseek)
+        }
+
+        let fetcher = UsageFetcher()
+        let store = UsageStore(fetcher: fetcher, browserDetection: BrowserDetection(cacheTTL: 0), settings: settings)
+        let controller = StatusItemController(
+            store: store,
+            settings: settings,
+            account: fetcher.loadAccountInfo(),
+            updater: DisabledUpdaterController(),
+            preferencesSelection: PreferencesSelection(),
+            statusBar: self.makeStatusBarForTesting())
+        defer { controller.releaseStatusItemsForTesting() }
+
+        let submenu = NSMenu()
+        submenu.autoenablesItems = false
+        _ = controller.appendOverviewProviderDetailItems(to: submenu, provider: .deepseek, width: 310)
+
+        let dashboardItem = try #require(submenu.items.first { $0.title == "Usage Dashboard" })
+        #expect(dashboardItem.action == #selector(StatusItemController.openDashboardFromMenuItem(_:)))
+        #expect(dashboardItem.identifier?.rawValue == UsageProvider.deepseek.rawValue)
+
+        let statusItem = try #require(submenu.items.first { $0.title == "Status Page" })
+        #expect(statusItem.action == #selector(StatusItemController.openStatusPageFromMenuItem(_:)))
+        #expect(statusItem.identifier?.rawValue == UsageProvider.deepseek.rawValue)
+    }
+
+    @Test
+    func `overview submenu hydration is reachable through appendOverviewProviderDetailItems`() {
         self.disableMenuCardsForTesting()
         let settings = self.makeSettings()
         settings.statusChecksEnabled = false

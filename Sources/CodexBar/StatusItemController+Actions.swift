@@ -266,6 +266,15 @@ extension StatusItemController: StatusItemMenuPersistentActionDelegate {
         NSWorkspace.shared.open(url)
     }
 
+    @objc func openDashboardFromMenuItem(_ sender: NSMenuItem) {
+        let provider = (sender.identifier?.rawValue).flatMap(UsageProvider.init(rawValue:))
+            ?? self.lastMenuProvider
+            ?? (self.store.isEnabled(.codex) ? .codex : self.store.enabledProviders().first)
+            ?? .codex
+        guard let url = self.dashboardURL(for: provider) else { return }
+        NSWorkspace.shared.open(url)
+    }
+
     func dashboardURL(
         for provider: UsageProvider,
         environment: [String: String] = ProcessInfo.processInfo.environment) -> URL?

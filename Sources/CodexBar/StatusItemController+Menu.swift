@@ -70,7 +70,6 @@ extension StatusItemController {
     func menuWillOpen(_ menu: NSMenu) {
         // Records interaction and may bring an adaptive timer forward; never refreshes synchronously.
         self.store.noteMenuOpened()
-        self.agentSessions.refreshOnMenuOpen()
 
         let trace = self.beginMenuOperationTrace("menuWillOpen", breadcrumb: "menuWillOpen")
         defer { self.endMenuOperationTrace(trace, menu: menu, provider: self.menuProvider(for: menu)) }
@@ -330,7 +329,11 @@ extension StatusItemController {
                 to: menu,
                 context: menuContext,
                 switcherSelection: contentSelection)
-            self.addActionableSections(context.descriptor.sections, to: menu, width: context.menuWidth)
+            self.addActionableSections(
+                context.descriptor.sections,
+                to: menu,
+                width: context.menuWidth,
+                provider: context.currentProvider)
             self.rememberMenuLocalizationSignature()
         }
     }
@@ -631,6 +634,7 @@ extension StatusItemController {
         _ sections: [MenuDescriptor.Section],
         to menu: NSMenu,
         width: CGFloat,
+        provider: UsageProvider? = nil,
         captureMenu: NSMenu? = nil)
     {
         let actionableSections = sections.filter { section in section.entries.contains(where: \ .isActionable) }
@@ -669,6 +673,9 @@ extension StatusItemController {
                     let item = NSMenuItem(title: localizedTitle, action: selector, keyEquivalent: "")
                     item.target = self
                     item.representedObject = represented
+                    if action == .dashboard || action == .statusPage {
+                        item.identifier = NSUserInterfaceItemIdentifier(provider?.rawValue ?? "")
+                    }
                     if let shortcut = self.shortcut(for: action) {
                         item.keyEquivalent = shortcut.key
                         item.keyEquivalentModifierMask = shortcut.modifiers

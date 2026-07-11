@@ -117,7 +117,6 @@ final class StatusItemController: NSObject, NSMenuDelegate, StatusItemControllin
 
     let store: UsageStore
     let settings: SettingsStore
-    let agentSessions: AgentSessionsStore
     lazy var menuCardRefreshMonitor = self.makeMenuCardRefreshMonitor()
 
     let account: AccountInfo
@@ -240,8 +239,6 @@ final class StatusItemController: NSObject, NSMenuDelegate, StatusItemControllin
     private var lastMergeIcons: Bool
     private var lastObservedUsageBarsShowUsed: Bool
     var lastWidgetDisplaySettingsSignature = ""
-    private var lastAgentSessionsEnabled: Bool
-    private var lastAgentSessionsManualHosts: String
     /// Tracks localization-sensitive labels used by the merged menu.
     /// Used to force menu rebuilds when app language changes.
     var lastMenuLocalizationSignature: String = ""
@@ -354,7 +351,6 @@ final class StatusItemController: NSObject, NSMenuDelegate, StatusItemControllin
         }
         self.store = store
         self.settings = settings
-        self.agentSessions = AgentSessionsStore(settings: settings)
         self.account = account
         self.updater = updater
         self.preferencesSelection = preferencesSelection
@@ -369,8 +365,6 @@ final class StatusItemController: NSObject, NSMenuDelegate, StatusItemControllin
         self.lastProviderOrder = settings.providerOrder
         self.lastMergeIcons = settings.mergeIcons
         self.lastObservedUsageBarsShowUsed = settings.usageBarsShowUsed
-        self.lastAgentSessionsEnabled = settings.agentSessionsEnabled
-        self.lastAgentSessionsManualHosts = settings.agentSessionsManualHosts
         self.menuCardRenderingEnabledForController = menuCardRenderingEnabled
         self.menuRefreshEnabledForController = menuRefreshEnabled
         let repairedStatusItemVisibilityKeys = MenuBarStatusItemDefaultsRepair
@@ -393,12 +387,6 @@ final class StatusItemController: NSObject, NSMenuDelegate, StatusItemControllin
         self.lastMenuAdjunctReadinessBaselineVersion = self.menuSession.contentVersion
         self.lastWidgetDisplaySettingsSignature = self.widgetDisplaySettingsSignature()
         self.wireBindings()
-        self.agentSessions.onUpdate = { [weak self] in
-            self?.invalidateMenus(refreshOpenMenus: true)
-        }
-        if !SettingsStore.isRunningTests {
-            self.agentSessions.start()
-        }
         self.updateVisibility()
         self.updateIcons()
         self.scheduleCodexAccountMenuProjectionRevalidationIfNeeded(
@@ -632,13 +620,6 @@ final class StatusItemController: NSObject, NSMenuDelegate, StatusItemControllin
         #if DEBUG
         guard !self.isReleasedForTesting else { return }
         #endif
-        let agentSessionsSettingsChanged = self.settings.agentSessionsEnabled != self.lastAgentSessionsEnabled ||
-            self.settings.agentSessionsManualHosts != self.lastAgentSessionsManualHosts
-        if agentSessionsSettingsChanged {
-            self.lastAgentSessionsEnabled = self.settings.agentSessionsEnabled
-            self.lastAgentSessionsManualHosts = self.settings.agentSessionsManualHosts
-            self.agentSessions.settingsDidChange()
-        }
         let configChanged = self.settings.configRevision != self.lastConfigRevision
         let orderChanged = self.settings.providerOrder != self.lastProviderOrder
         let localizationChanged = self.menuLocalizationSignature() != self.lastMenuLocalizationSignature

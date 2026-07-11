@@ -603,14 +603,6 @@ struct CodexBarTests {
     }
 
     @Test
-    @MainActor
-    func `status icon accessibility uses percentage scale`() {
-        #expect(
-            StatusIconView.accessibilityPercentRemaining(50) ==
-                String(format: L("%d percent remaining"), 50))
-    }
-
-    @Test
     func `codex icon promotes weekly only window into primary display lane`() {
         let snapshot = UsageSnapshot(
             primary: nil,

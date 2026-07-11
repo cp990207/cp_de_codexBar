@@ -687,7 +687,11 @@ extension StatusItemController {
             to: submenu,
             context: menuContext,
             switcherSelection: .provider(provider))
-        self.addActionableSections(descriptor.sections, to: submenu, width: width)
+        self.addActionableSections(
+            descriptor.sections,
+            to: submenu,
+            width: width,
+            provider: provider)
         return !submenu.items.isEmpty
     }
 }

@@ -43,10 +43,7 @@ extension StatusItemController {
             managedCodexAccountCoordinator: self.managedCodexAccountCoordinator,
             codexAccountPromotionCoordinator: self.codexAccountPromotionCoordinator,
             updateReady: self.updater.updateStatus.isUpdateReady,
-            includeContextualActions: includeContextualActions,
-            agentSessionsEnabled: self.settings.agentSessionsEnabled,
-            localAgentSessions: self.agentSessions.localSessions,
-            remoteAgentHosts: self.agentSessions.remoteHosts)
+            includeContextualActions: includeContextualActions)
     }
 
     func measuredStandardMenuWidth(for sections: [MenuDescriptor.Section], baseWidth: CGFloat) -> CGFloat {
@@ -57,7 +54,7 @@ extension StatusItemController {
 
         let measuringMenu = NSMenu()
         measuringMenu.autoenablesItems = false
-        self.addActionableSections(sections, to: measuringMenu, width: baseWidth)
+        self.addActionableSections(sections, to: measuringMenu, width: baseWidth, provider: nil)
         let measured = ceil(measuringMenu.size.width)
         if self.measuredStandardMenuWidthCache.count >= Self.measuredStandardMenuWidthCacheLimit {
             self.measuredStandardMenuWidthCache.removeAll(keepingCapacity: true)
@@ -141,8 +138,6 @@ extension StatusItemController {
             "quit"
         case let .copyError(message):
             "copyError:\(message)"
-        case let .focusAgentSession(session, remoteHost):
-            "focusAgentSession:\(remoteHost ?? "local"):\(session.id)"
         }
     }
 }
