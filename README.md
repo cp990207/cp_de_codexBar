@@ -20,6 +20,7 @@ CodexBar 是一个 macOS 菜单栏小工具，把 Codex、Claude、Cursor、Gemi
 - **重构合并菜单的账号切换与总览子菜单** — 重写了多账号 Provider 切换器的实现（`StatusItemController+AccountSwitcherViews.swift`），替换了旧的 switcher 实现。
 - **修复总览行悬浮子菜单闪烁问题** — 悬浮 Provider 详情子菜单时，因子菜单内容未重新打上身份标记，导致父行在子菜单打开时被重建，引发子菜单反复关闭又打开的抖动。
 - **修复 Provider 仪表盘/状态页链接** — 让菜单里的 Dashboard、Status 跳转按 Provider 区分，跳到正确的目标页面。
+- **增强 Kimi 用量面板** — 菜单显示会员计划名（如 Allegretto）和周配额请求数（used/limit）；新增「套餐用量」历史：记录每个 5 小时周期和每周（7 天）额度的消耗百分比，图表支持 5 小时｜7 天切换，下方列出最近 5 小时周期的峰值用量，与 Claude/Codex 的历史视图一致。
 - 若干本地化字符串调整。
 
 具体改动见 [CHANGELOG.md](CHANGELOG.md) 和 git 提交历史。
@@ -27,6 +28,10 @@ CodexBar 是一个 macOS 菜单栏小工具，把 Codex、Claude、Cursor、Gemi
 ## 效果预览
 
 上图为中文本地化界面下的 Claude、Codex、OpenCode Go、MiniMax、Kimi、DeepSeek 用量面板示例：每个 Provider 的会话/每周/每日额度、剩余百分比、重置倒计时和费用统计一目了然。
+
+Kimi 的「套餐用量」子菜单：5 小时｜7 天切换查看历史额度曲线，下方列出最近 5 小时周期的峰值用量：
+
+![Kimi 套餐用量历史](kimi-usage.png)
 
 ## Build from source
 

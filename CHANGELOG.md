@@ -12,6 +12,8 @@
 - Claude CLI: surface model-scoped weekly limits alongside all-model usage without duplicating matching web limits. Thanks @janpollak!
 - Documentation: add detailed setup and troubleshooting references for Azure OpenAI, Perplexity, Mistral, and Qoder. Thanks @kiranmagic7!
 - Quota warnings: add opt-in predictive pace alerts for Codex and Claude session and weekly limits, with one alert per risk episode. Thanks @vincent-peng!
+- Kimi: show the membership plan name in the menu — read from `MembershipService/GetSubscription` for cookie auth and from the Code API membership level for API-key auth — and surface weekly request counts alongside the quota bars.
+- Kimi: record 5-hour and weekly plan utilization history — the Plan Usage submenu gains a 5-Hour/7-Day segmented chart and a recent 5-hour cycle list, matching the Claude and Codex history views.
 
 ### Fixed
 - Menus: stop completed provider cards and plan-utilization rows from remaining in “Refreshing…” while unrelated provider or token-cost work is still running. Thanks @Yuxin-Qiao!

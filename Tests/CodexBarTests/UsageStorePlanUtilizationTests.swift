@@ -1168,6 +1168,105 @@ extension UsageStorePlanUtilizationTests {
         #expect(!store.shouldShowRefreshingMenuCardIndicator(for: .claude))
         #expect(!store.shouldHidePlanUtilizationMenuItem(for: .claude))
     }
+
+    @MainActor
+    @Test
+    func `record plan history maps kimi five hour window to session series`() async {
+        let store = Self.makeStore()
+        let sessionReset = Date(timeIntervalSince1970: 1_710_000_000)
+        let weeklyReset = Date(timeIntervalSince1970: 1_710_086_400)
+        let snapshot = Self.makeKimiSnapshot(sessionReset: sessionReset, weeklyReset: weeklyReset)
+        store._setSnapshotForTesting(snapshot, provider: .kimi)
+
+        await store.recordPlanUtilizationHistorySample(
+            provider: .kimi,
+            snapshot: snapshot,
+            now: Date(timeIntervalSince1970: 1_700_000_000))
+
+        let histories = store.planUtilizationHistory(for: .kimi)
+        #expect(findSeries(histories, name: .session, windowMinutes: 300)?.entries.last?.usedPercent == 65)
+        #expect(findSeries(histories, name: .session, windowMinutes: 300)?.entries.last?.resetsAt == sessionReset)
+        // The primary weekly quota (40%) feeds the weekly series, not the Code 7-day extra (30%).
+        #expect(findSeries(histories, name: .weekly, windowMinutes: 10080)?.entries.last?.usedPercent == 40)
+        #expect(findSeries(histories, name: .weekly, windowMinutes: 10080)?.entries.last?.resetsAt == weeklyReset)
+    }
+
+    @MainActor
+    @Test
+    func `record plan history records kimi weekly quota without code 7d extra window`() async {
+        let store = Self.makeStore()
+        let weeklyReset = Date(timeIntervalSince1970: 1_710_086_400)
+        var snapshot = Self.makeKimiSnapshot(
+            sessionReset: Date(timeIntervalSince1970: 1_710_000_000),
+            weeklyReset: weeklyReset)
+        // API-key auth has no Code 7-day extra window; the primary weekly quota must still record.
+        snapshot = UsageSnapshot(
+            primary: snapshot.primary,
+            secondary: snapshot.secondary,
+            tertiary: snapshot.tertiary,
+            extraRateWindows: nil,
+            providerCost: snapshot.providerCost,
+            updatedAt: snapshot.updatedAt,
+            identity: snapshot.identity)
+        store._setSnapshotForTesting(snapshot, provider: .kimi)
+
+        await store.recordPlanUtilizationHistorySample(
+            provider: .kimi,
+            snapshot: snapshot,
+            now: Date(timeIntervalSince1970: 1_700_000_000))
+
+        let histories = store.planUtilizationHistory(for: .kimi)
+        #expect(findSeries(histories, name: .weekly, windowMinutes: 10080)?.entries.last?.usedPercent == 40)
+        #expect(findSeries(histories, name: .weekly, windowMinutes: 10080)?.entries.last?.resetsAt == weeklyReset)
+    }
+
+    @MainActor
+    @Test
+    func `record plan history keeps kimi recording when historical tracking disabled`() async {
+        let store = Self.makeStore()
+        store.settings.historicalTrackingEnabled = false
+        let snapshot = Self.makeKimiSnapshot(
+            sessionReset: Date(timeIntervalSince1970: 1_710_000_000),
+            weeklyReset: Date(timeIntervalSince1970: 1_710_086_400))
+        store._setSnapshotForTesting(snapshot, provider: .kimi)
+
+        await store.recordPlanUtilizationHistorySample(
+            provider: .kimi,
+            snapshot: snapshot,
+            now: Date(timeIntervalSince1970: 1_700_000_000))
+
+        #expect(findSeries(store.planUtilizationHistory(for: .kimi), name: .session, windowMinutes: 300) != nil)
+    }
+
+    @MainActor
+    static func makeKimiSnapshot(sessionReset: Date, weeklyReset: Date) -> UsageSnapshot {
+        UsageSnapshot(
+            primary: RateWindow(
+                usedPercent: 40,
+                windowMinutes: nil,
+                resetsAt: weeklyReset,
+                resetDescription: "200/500 requests"),
+            secondary: RateWindow(
+                usedPercent: 65,
+                windowMinutes: 300,
+                resetsAt: sessionReset,
+                resetDescription: "Rate: 13/20 per 5 hours"),
+            tertiary: nil,
+            extraRateWindows: [NamedRateWindow(
+                id: "kimi-code-7d",
+                title: "Code 7-day",
+                window: RateWindow(
+                    usedPercent: 30,
+                    windowMinutes: 10080,
+                    resetsAt: weeklyReset,
+                    resetDescription: nil))],
+            updatedAt: Date(),
+            identity: ProviderIdentitySnapshot(
+                providerID: .kimi,
+                accountEmail: nil,
+                accountOrganization: nil,
+                loginMethod: nil))
+    }
 }
 
 func planEntry(at capturedAt: Date, usedPercent: Double, resetsAt: Date? = nil) -> PlanUtilizationHistoryEntry {

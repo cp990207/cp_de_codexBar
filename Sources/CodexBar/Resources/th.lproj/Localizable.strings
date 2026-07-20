@@ -1155,3 +1155,6 @@
 "Show Codex Spark usage" = "แสดงการใช้งาน Codex Spark";
 "Shows Codex Spark quota rows in the menu and provider preview. Requires optional credits and extra usage in Display settings." = "แสดงแถวโควตา Codex Spark ในเมนูและตัวอย่างผู้ให้บริการ ต้องเปิดใช้ “แสดงเครดิต + การใช้งานเพิ่มเติม” ในการตั้งค่าการแสดงผล";
 "Scroll to see more models" = "เลื่อนเพื่อดูโมเดลเพิ่มเติม";
+"5-Hour" = "5 ชั่วโมง";
+"7-Day" = "7 วัน";
+"Recent 5-Hour Cycles" = "รอบ 5 ชั่วโมงล่าสุด";

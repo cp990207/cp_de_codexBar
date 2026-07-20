@@ -334,6 +334,44 @@ struct KimiUsageResponseParsingTests {
     }
 
     @Test
+    func `parses code API usage response with membership level`() throws {
+        // Shape captured from the live `GET https://api.kimi.com/coding/v1/usages` endpoint.
+        let json = """
+        {
+          "user": {
+            "userId": "d2li44teik6k8n3fk900",
+            "region": "REGION_CN",
+            "membership": { "level": "LEVEL_INTERMEDIATE" },
+            "businessId": ""
+          },
+          "usage": { "limit": "100", "used": "1", "remaining": "99", "resetTime": "2026-07-27T00:46:40.537086Z" },
+          "limits": [],
+          "authentication": { "method": "METHOD_API_KEY", "scope": "FEATURE_CODING" },
+          "subType": "TYPE_PURCHASE",
+          "domain": "DOMAIN_NEXUS"
+        }
+        """
+
+        let snapshot = try KimiUsageFetcher._parseCodeAPIUsageForTesting(Data(json.utf8))
+        #expect(snapshot.weekly.limit == "100")
+
+        let usage = snapshot.toUsageSnapshot()
+        #expect(usage.identity?.loginMethod == "Allegretto")
+    }
+
+    @Test
+    func `code API usage without user info has no plan identity`() throws {
+        let json = """
+        {
+          "usage": { "limit": "2048", "used": "375", "remaining": "1673" }
+        }
+        """
+
+        let snapshot = try KimiUsageFetcher._parseCodeAPIUsageForTesting(Data(json.utf8))
+        #expect(snapshot.toUsageSnapshot().identity?.loginMethod == nil)
+    }
+
+    @Test
     func `converts weekly-only usage into primary quota lane`() {
         let snapshot = KimiUsageSnapshot(
             weekly: KimiUsageDetail(
@@ -438,6 +476,40 @@ struct KimiUsageResponseParsingTests {
     }
 
     @Test
+    func `parses get subscription response`() throws {
+        // Shape captured from the live MembershipService/GetSubscription endpoint (annual Allegretto).
+        let json = """
+        {
+          "subscribed": true,
+          "purchaseSubscription": {
+            "subscriptionId": "19f7cfd4-3992-84dd-8000-00001017a04c",
+            "goods": {
+              "id": "19b69633-d922-8f16-8000-000055ef82f5",
+              "title": "Allegretto",
+              "durationDays": 30,
+              "useRegion": "REGION_CN",
+              "membershipLevel": "LEVEL_INTERMEDIATE",
+              "type": "GOODS_TYPE_SUBSCRIPTION",
+              "domain": "DOMAIN_NEXUS"
+            },
+            "currentEndTime": "2027-07-21T00:00:00Z",
+            "status": "SUBSCRIPTION_STATUS_ACTIVE",
+            "type": "TYPE_PURCHASE",
+            "active": true
+          }
+        }
+        """
+
+        let response = try JSONDecoder().decode(KimiSubscriptionResponse.self, from: Data(json.utf8))
+
+        #expect(response.subscribed == true)
+        #expect(response.purchaseSubscription?.goods?.title == "Allegretto")
+        #expect(response.purchaseSubscription?.goods?.membershipLevel == "LEVEL_INTERMEDIATE")
+        #expect(response.purchaseSubscription?.active == true)
+        #expect(response.purchaseSubscription?.currentEndTime == "2027-07-21T00:00:00Z")
+    }
+
+    @Test
     func `subscription grace is a total budget for existing usage windows`() async throws {
         let usageJSON = """
         {
@@ -490,8 +562,9 @@ struct KimiUsageResponseParsingTests {
         #expect(usage.extraRateWindows == nil)
         #expect(elapsed < .milliseconds(250), "Subscription enrichment outlived its total budget: \(elapsed)")
 
-        // Drain the deliberately cancellation-ignoring test request before the test exits.
-        try await Task.sleep(for: .milliseconds(550))
+        // Drain the deliberately cancellation-ignoring test requests (stats + subscription,
+        // up to two sequential 0.5s responses) before the test exits.
+        try await Task.sleep(for: .milliseconds(1100))
     }
 
     @Test
@@ -522,6 +595,16 @@ struct KimiUsageResponseParsingTests {
           }
         }
         """
+        let subscriptionPlanJSON = """
+        {
+          "subscribed": true,
+          "purchaseSubscription": {
+            "goods": { "title": "Allegretto", "membershipLevel": "LEVEL_INTERMEDIATE" },
+            "status": "SUBSCRIPTION_STATUS_ACTIVE",
+            "active": true
+          }
+        }
+        """
         let transport = ProviderHTTPTransportHandler { request in
             let url = try #require(request.url)
             let response = try #require(HTTPURLResponse(
@@ -532,15 +615,19 @@ struct KimiUsageResponseParsingTests {
             if url.path.hasSuffix("/GetUsages") {
                 return (Data(usageJSON.utf8), response)
             }
-            #expect(url.path.hasSuffix("/GetSubscriptionStats"))
-            return (Data(subscriptionJSON.utf8), response)
+            if url.path.hasSuffix("/GetSubscriptionStats") {
+                return (Data(subscriptionJSON.utf8), response)
+            }
+            #expect(url.path.hasSuffix("/GetSubscription"))
+            return (Data(subscriptionPlanJSON.utf8), response)
         }
 
         let snapshot = try await KimiUsageFetcher._fetchUsageForTesting(
             authToken: "test-token",
             transport: transport,
             subscriptionGrace: .seconds(1))
-        let windows = try #require(snapshot.toUsageSnapshot().extraRateWindows)
+        let usage = snapshot.toUsageSnapshot()
+        let windows = try #require(usage.extraRateWindows)
         let monthly = try #require(windows.first { $0.id == "kimi-monthly" })
         let weeklyCode = try #require(windows.first { $0.id == "kimi-code-7d" })
 
@@ -549,6 +636,55 @@ struct KimiUsageResponseParsingTests {
         #expect(weeklyCode.title == "Code 7-day")
         #expect(weeklyCode.window.usedPercent == 17)
         #expect(weeklyCode.window.windowMinutes == 7 * 24 * 60)
+        #expect(usage.identity?.loginMethod == "Allegretto")
+    }
+
+    @Test
+    func `inactive subscription does not surface plan title`() async throws {
+        let usageJSON = """
+        {
+          "usages": [
+            {
+              "scope": "FEATURE_CODING",
+              "detail": { "limit": "100", "used": "25", "remaining": "75" },
+              "limits": []
+            }
+          ]
+        }
+        """
+        let subscriptionPlanJSON = """
+        {
+          "subscribed": false,
+          "purchaseSubscription": {
+            "goods": { "title": "Allegretto" },
+            "status": "SUBSCRIPTION_STATUS_CANCELLED",
+            "active": false
+          }
+        }
+        """
+        let transport = ProviderHTTPTransportHandler { request in
+            let url = try #require(request.url)
+            let response = try #require(HTTPURLResponse(
+                url: url,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: nil))
+            if url.path.hasSuffix("/GetUsages") {
+                return (Data(usageJSON.utf8), response)
+            }
+            if url.path.hasSuffix("/GetSubscriptionStats") {
+                return (Data("{}".utf8), response)
+            }
+            #expect(url.path.hasSuffix("/GetSubscription"))
+            return (Data(subscriptionPlanJSON.utf8), response)
+        }
+
+        let snapshot = try await KimiUsageFetcher._fetchUsageForTesting(
+            authToken: "test-token",
+            transport: transport,
+            subscriptionGrace: .seconds(1))
+
+        #expect(snapshot.toUsageSnapshot().identity?.loginMethod == nil)
     }
 
     @Test
@@ -679,6 +815,50 @@ struct KimiUsageSnapshotConversionTests {
 
         #expect(usageSnapshot.tertiary == nil)
         #expect(usageSnapshot.updatedAt == now)
+    }
+
+    @Test
+    func `uses subscription title as plan identity`() {
+        let snapshot = KimiUsageSnapshot(
+            weekly: KimiUsageDetail(limit: "100", used: "1", remaining: "99", resetTime: nil),
+            rateLimit: nil,
+            subscriptionTitle: "Allegretto",
+            updatedAt: Date())
+
+        #expect(snapshot.toUsageSnapshot().identity?.loginMethod == "Allegretto")
+    }
+
+    @Test
+    func `maps code API membership level to plan identity`() {
+        let snapshot = KimiUsageSnapshot(
+            weekly: KimiUsageDetail(limit: "100", used: "1", remaining: "99", resetTime: nil),
+            rateLimit: nil,
+            membershipLevel: "LEVEL_INTERMEDIATE",
+            updatedAt: Date())
+
+        #expect(snapshot.toUsageSnapshot().identity?.loginMethod == "Allegretto")
+    }
+
+    @Test
+    func `prefers subscription title over membership level`() {
+        let snapshot = KimiUsageSnapshot(
+            weekly: KimiUsageDetail(limit: "100", used: "1", remaining: "99", resetTime: nil),
+            rateLimit: nil,
+            subscriptionTitle: "Moderato",
+            membershipLevel: "LEVEL_INTERMEDIATE",
+            updatedAt: Date())
+
+        #expect(snapshot.toUsageSnapshot().identity?.loginMethod == "Moderato")
+    }
+
+    @Test
+    func `humanizes unmapped membership level`() {
+        #expect(KimiUsageSnapshot.planName(subscriptionTitle: nil, membershipLevel: "LEVEL_ADVANCED") == "Advanced")
+        #expect(KimiUsageSnapshot.planName(subscriptionTitle: nil, membershipLevel: "LEVEL_UNSPECIFIED") ==
+            "Unspecified")
+        #expect(KimiUsageSnapshot.planName(subscriptionTitle: nil, membershipLevel: "custom") == "custom")
+        #expect(KimiUsageSnapshot.planName(subscriptionTitle: "  ", membershipLevel: nil) == nil)
+        #expect(KimiUsageSnapshot.planName(subscriptionTitle: nil, membershipLevel: nil) == nil)
     }
 
     @Test

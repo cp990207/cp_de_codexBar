@@ -1154,3 +1154,6 @@
 "Show Codex Spark usage" = "Mostreu l'ús de Codex Spark";
 "Shows Codex Spark quota rows in the menu and provider preview. Requires optional credits and extra usage in Display settings." = "Mostreu les files de quota de Codex Spark al menú i a la previsualització del proveïdor. Cal activar «Mostreu crèdits + ús addicional» a la configuració de Pantalla.";
 "Scroll to see more models" = "Desplaceu-vos per veure més models";
+"5-Hour" = "5 hores";
+"7-Day" = "7 dies";
+"Recent 5-Hour Cycles" = "Cicles de 5 hores recents";

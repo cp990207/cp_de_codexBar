@@ -11,6 +11,8 @@ public struct KimiUsageFetcher: Sendable {
         URL(string: "https://www.kimi.com/apiv2/kimi.gateway.billing.v1.BillingService/GetUsages")!
     private static let subscriptionStatsURL =
         URL(string: "https://www.kimi.com/apiv2/kimi.gateway.membership.v2.MembershipService/GetSubscriptionStats")!
+    private static let subscriptionURL =
+        URL(string: "https://www.kimi.com/apiv2/kimi.gateway.membership.v2.MembershipService/GetSubscription")!
 
     public static func fetchCodeAPIUsage(
         apiKey: String,
@@ -83,8 +85,8 @@ public struct KimiUsageFetcher: Sendable {
     {
         let sessionInfo = self.decodeSessionInfo(from: authToken)
 
-        let subscriptionTask = Task<KimiSubscriptionStatsResponse?, Error> {
-            try await self.fetchSubscriptionStats(
+        let subscriptionTask = Task<KimiWebSubscriptionExtras, Error> {
+            try await self.fetchWebSubscriptionExtras(
                 authToken: authToken,
                 sessionInfo: sessionInfo,
                 transport: transport)
@@ -118,22 +120,30 @@ public struct KimiUsageFetcher: Sendable {
         try Task.checkCancellation()
 
         let subscriptionStats: KimiSubscriptionStatsResponse?
+        let subscription: KimiSubscriptionResponse?
         switch subscriptionOutcome {
-        case let .value(response):
-            subscriptionStats = response
+        case let .value(extras):
+            subscriptionStats = extras.stats
+            subscription = extras.subscription
         case .timedOut:
             Self.log.warning("Kimi subscription stats timed out")
             subscriptionStats = nil
+            subscription = nil
         case let .failure(error):
             Self.log.warning("Kimi subscription stats unavailable: \(error.localizedDescription)")
             subscriptionStats = nil
+            subscription = nil
         }
+
+        let purchase = subscription?.purchaseSubscription
+        let subscriptionTitle = purchase?.active == false ? nil : purchase?.goods?.title
 
         return KimiUsageSnapshot(
             weekly: codingUsage.detail,
             rateLimit: codingUsage.limits?.first?.detail,
             subscriptionBalance: subscriptionStats?.subscriptionBalance,
             subscriptionCodeWeeklyLimit: subscriptionStats?.ratelimitCode7d,
+            subscriptionTitle: subscriptionTitle,
             updatedAt: now)
     }
 
@@ -177,6 +187,7 @@ public struct KimiUsageFetcher: Sendable {
         return KimiUsageSnapshot(
             weekly: response.usage,
             rateLimit: response.limits?.first?.detail,
+            membershipLevel: response.user?.membership?.level,
             updatedAt: now)
     }
 
@@ -217,6 +228,49 @@ public struct KimiUsageFetcher: Sendable {
                 throw CancellationError()
             }
             Self.log.warning("Kimi subscription stats unavailable: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    /// Best-effort bundle of the optional membership endpoints (web cookie auth only). Kept
+    /// sequential so a slow `GetSubscription` call cannot starve the established stats request.
+    private static func fetchWebSubscriptionExtras(
+        authToken: String,
+        sessionInfo: SessionInfo?,
+        transport: any ProviderHTTPTransport) async throws -> KimiWebSubscriptionExtras
+    {
+        let stats = try await self.fetchSubscriptionStats(
+            authToken: authToken,
+            sessionInfo: sessionInfo,
+            transport: transport)
+        try Task.checkCancellation()
+        let subscription = try await self.fetchSubscription(
+            authToken: authToken,
+            sessionInfo: sessionInfo,
+            transport: transport)
+        return KimiWebSubscriptionExtras(stats: stats, subscription: subscription)
+    }
+
+    private static func fetchSubscription(
+        authToken: String,
+        sessionInfo: SessionInfo?,
+        transport: any ProviderHTTPTransport) async throws -> KimiSubscriptionResponse?
+    {
+        var request = self.webRequest(url: self.subscriptionURL, authToken: authToken, sessionInfo: sessionInfo)
+        request.httpBody = Data("{}".utf8)
+
+        do {
+            let response = try await transport.response(for: request)
+            guard response.statusCode == 200 else {
+                Self.log.warning("Kimi subscription returned \(response.statusCode)")
+                return nil
+            }
+            return try JSONDecoder().decode(KimiSubscriptionResponse.self, from: response.data)
+        } catch {
+            if error is CancellationError || (error as? URLError)?.code == .cancelled || Task.isCancelled {
+                throw CancellationError()
+            }
+            Self.log.warning("Kimi subscription unavailable: \(error.localizedDescription)")
             return nil
         }
     }
@@ -295,4 +349,10 @@ public struct KimiUsageFetcher: Sendable {
         let sessionId: String?
         let trafficId: String?
     }
+}
+
+/// Best-effort results of the optional membership endpoints (see `fetchWebSubscriptionExtras`).
+struct KimiWebSubscriptionExtras: Sendable {
+    let stats: KimiSubscriptionStatsResponse?
+    let subscription: KimiSubscriptionResponse?
 }

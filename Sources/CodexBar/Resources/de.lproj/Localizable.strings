@@ -1148,3 +1148,6 @@
 "Show Codex Spark usage" = "Codex-Spark-Nutzung anzeigen";
 "Shows Codex Spark quota rows in the menu and provider preview. Requires optional credits and extra usage in Display settings." = "Zeigt die Codex-Spark-Kontingentzeilen im Menü und in der Anbietervorschau an. Erfordert, dass „Credits + zusätzliche Nutzung anzeigen“ in den Anzeigeeinstellungen aktiviert ist.";
 "Scroll to see more models" = "Scrollen, um weitere Modelle zu sehen";
+"5-Hour" = "5 Stunden";
+"7-Day" = "7 Tage";
+"Recent 5-Hour Cycles" = "Letzte 5-Stunden-Zyklen";

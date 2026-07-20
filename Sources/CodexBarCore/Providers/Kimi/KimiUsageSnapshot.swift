@@ -6,6 +6,10 @@ public struct KimiUsageSnapshot: Sendable {
     public let updatedAt: Date
     let subscriptionBalance: KimiSubscriptionBalance?
     let subscriptionCodeWeeklyLimit: KimiSubscriptionRateLimit?
+    /// Plan display name from `GetSubscription` (web cookie auth), e.g. "Allegretto".
+    let subscriptionTitle: String?
+    /// Membership level from the Code API (API-key auth), e.g. "LEVEL_INTERMEDIATE".
+    let membershipLevel: String?
 
     public init(weekly: KimiUsageDetail, rateLimit: KimiUsageDetail?, updatedAt: Date) {
         self.weekly = weekly
@@ -13,19 +17,25 @@ public struct KimiUsageSnapshot: Sendable {
         self.updatedAt = updatedAt
         self.subscriptionBalance = nil
         self.subscriptionCodeWeeklyLimit = nil
+        self.subscriptionTitle = nil
+        self.membershipLevel = nil
     }
 
     init(
         weekly: KimiUsageDetail,
         rateLimit: KimiUsageDetail?,
-        subscriptionBalance: KimiSubscriptionBalance?,
+        subscriptionBalance: KimiSubscriptionBalance? = nil,
         subscriptionCodeWeeklyLimit: KimiSubscriptionRateLimit? = nil,
+        subscriptionTitle: String? = nil,
+        membershipLevel: String? = nil,
         updatedAt: Date)
     {
         self.weekly = weekly
         self.rateLimit = rateLimit
         self.subscriptionBalance = subscriptionBalance
         self.subscriptionCodeWeeklyLimit = subscriptionCodeWeeklyLimit
+        self.subscriptionTitle = subscriptionTitle
+        self.membershipLevel = membershipLevel
         self.updatedAt = updatedAt
     }
 
@@ -121,7 +131,9 @@ extension KimiUsageSnapshot {
             providerID: .kimi,
             accountEmail: nil,
             accountOrganization: nil,
-            loginMethod: nil)
+            loginMethod: Self.planName(
+                subscriptionTitle: self.subscriptionTitle,
+                membershipLevel: self.membershipLevel))
 
         return UsageSnapshot(
             primary: weeklyWindow,
@@ -131,5 +143,20 @@ extension KimiUsageSnapshot {
             providerCost: nil,
             updatedAt: self.updatedAt,
             identity: identity)
+    }
+
+    /// Plan display name for the menu. Prefers the server-provided subscription title (web cookie
+    /// auth); falls back to the Code API membership level (API-key auth).
+    static func planName(subscriptionTitle: String?, membershipLevel: String?) -> String? {
+        if let title = subscriptionTitle?.trimmingCharacters(in: .whitespacesAndNewlines), !title.isEmpty {
+            return title
+        }
+        guard let level = membershipLevel?.trimmingCharacters(in: .whitespacesAndNewlines), !level.isEmpty else {
+            return nil
+        }
+        // Confirmed against `GetSubscription` goods.title (annual Allegretto reports LEVEL_INTERMEDIATE).
+        if level == "LEVEL_INTERMEDIATE" { return "Allegretto" }
+        guard level.hasPrefix("LEVEL_") else { return level }
+        return level.dropFirst("LEVEL_".count).lowercased().capitalized
     }
 }

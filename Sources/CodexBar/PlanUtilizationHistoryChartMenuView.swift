@@ -225,7 +225,7 @@ struct PlanUtilizationHistoryChartMenuView: View {
             .map { history in
                 VisibleSeries(
                     selection: SeriesSelection(name: history.name, windowMinutes: history.windowMinutes),
-                    title: self.seriesTitle(name: history.name, metadata: metadata),
+                    title: self.seriesTitle(name: history.name, metadata: metadata, provider: provider),
                     history: history)
             }
     }
@@ -258,6 +258,11 @@ struct PlanUtilizationHistoryChartMenuView: View {
             {
                 names.insert(.opus)
             }
+        case .kimi:
+            // Kimi's 5-hour rate limit rides in `secondary`; the primary weekly quota (no fixed
+            // windowMinutes) feeds the weekly history series.
+            if snapshot.secondary != nil { names.insert(.session) }
+            if snapshot.primary != nil { names.insert(.weekly) }
         default:
             let windows = [snapshot.primary, snapshot.secondary, snapshot.tertiary].compactMap(\.self)
                 + (snapshot.extraRateWindows?.filter(\.usageKnown).map(\.window) ?? [])
@@ -614,9 +619,23 @@ struct PlanUtilizationHistoryChartMenuView: View {
 
     private nonisolated static func seriesTitle(
         name: PlanUtilizationSeriesName,
-        metadata: ProviderMetadata?) -> String
+        metadata: ProviderMetadata?,
+        provider: UsageProvider) -> String
     {
-        switch name {
+        if provider == .kimi {
+            // Kimi's metadata labels name its live-card lanes: `sessionLabel` ("Weekly") is the
+            // primary weekly quota and `weeklyLabel` ("Rate Limit") is the 5-hour rate limit — the
+            // opposite of the history series names. Use explicit duration names for the toggle.
+            switch name {
+            case .session:
+                return L("5-Hour")
+            case .weekly:
+                return L("7-Day")
+            default:
+                break
+            }
+        }
+        return switch name {
         case .session:
             L(metadata?.sessionLabel ?? "Session")
         case .weekly:
@@ -662,6 +681,7 @@ struct PlanUtilizationHistoryChartMenuView: View {
         let xDomain: ClosedRange<Double>?
         let selectedSeries: String?
         let visibleSeries: [String]
+        let seriesTitles: [String]
         let usedPercents: [Double]
         let pointDates: [String]
     }
@@ -685,6 +705,7 @@ struct PlanUtilizationHistoryChartMenuView: View {
             xDomain: model.xDomain,
             selectedSeries: selectedSeries?.id,
             visibleSeries: visibleSeries.map(\.id),
+            seriesTitles: visibleSeries.map(\.title),
             usedPercents: model.points.map(\.usedPercent),
             pointDates: model.points.map { point in
                 let formatter = DateFormatter()

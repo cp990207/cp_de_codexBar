@@ -1152,3 +1152,6 @@
 "Show Codex Spark usage" = "Codex Spark kullanımını göster";
 "Shows Codex Spark quota rows in the menu and provider preview. Requires optional credits and extra usage in Display settings." = "Codex Spark kota satırlarını menüde ve sağlayıcı önizlemesinde gösterir. Görünüm ayarlarında “Krediler + ekstra kullanımı göster” seçeneğinin etkin olmasını gerektirir.";
 "Scroll to see more models" = "Daha fazla model görmek için kaydırın";
+"5-Hour" = "5 saat";
+"7-Day" = "7 gün";
+"Recent 5-Hour Cycles" = "Son 5 saatlik döngüler";

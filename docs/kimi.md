@@ -12,8 +12,9 @@ Tracks usage for [Kimi For Coding](https://www.kimi.com/code) in CodexBar.
 
 ## Features
 
-- Displays weekly request quota (from membership tier)
+- Displays weekly request quota (from membership tier), including used/limit request counts
 - Shows current 5-hour rate limit usage
+- Shows the membership plan name (e.g. Allegretto) in the menu
 - API-key, automatic cookie, and manual cookie authentication methods
 - Automatic refresh countdown
 
@@ -91,6 +92,11 @@ When multiple sources are available, CodexBar uses this order:
 **Response**:
 ```json
 {
+  "user": {
+    "userId": "d2li44teik6k8n3fk900",
+    "region": "REGION_CN",
+    "membership": {"level": "LEVEL_INTERMEDIATE"}
+  },
   "usage": {
     "limit": "2048",
     "used": "214",
@@ -108,6 +114,11 @@ When multiple sources are available, CodexBar uses this order:
   }]
 }
 ```
+
+`user.membership.level` feeds the menu plan label on the API-key path. The level is a
+category, not the store title: an annual Allegretto subscription reports `LEVEL_INTERMEDIATE`,
+so only that mapping is hard-coded; other `LEVEL_*` values fall back to a humanized suffix
+(e.g. `LEVEL_ADVANCED` → "Advanced").
 
 ### Kimi web cookie fallback
 
@@ -138,6 +149,16 @@ When multiple sources are available, CodexBar uses this order:
   }]
 }
 ```
+
+Two best-effort membership endpoints enrich the web-cookie path (both share the same auth
+headers as `GetUsages`; failures leave the affected rows hidden):
+
+- `POST .../kimi.gateway.membership.v2.MembershipService/GetSubscriptionStats` — monthly
+  subscription pool (`subscriptionBalance.amountUsedRatio`) and the Code 7-day window
+  (`ratelimitCode7d`).
+- `POST .../kimi.gateway.membership.v2.MembershipService/GetSubscription` — plan display name
+  from `purchaseSubscription.goods.title` (e.g. `"Allegretto"`), shown as the menu plan label
+  when the subscription is active.
 
 ## Membership Tiers
 

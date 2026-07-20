@@ -1184,3 +1184,6 @@
 "Show Codex Spark usage" = "顯示 Codex Spark 使用量";
 "Shows Codex Spark quota rows in the menu and provider preview. Requires optional credits and extra usage in Display settings." = "在選單和提供者預覽中顯示 Codex Spark 配額列。需要在「顯示」設定中啟用「顯示額度 + 額外使用量」。";
 "Scroll to see more models" = "捲動查看更多模型";
+"5-Hour" = "5 小時";
+"7-Day" = "7 天";
+"Recent 5-Hour Cycles" = "最近 5 小時週期";

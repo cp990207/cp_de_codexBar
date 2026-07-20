@@ -772,6 +772,9 @@
 "No utilization data yet." = "No utilization data yet.";
 "No %@ utilization data yet." = "No %@ utilization data yet.";
 "%@: %@%% used" = "%@: %@%% used";
+"Recent 5-Hour Cycles" = "Recent 5-Hour Cycles";
+"5-Hour" = "5-Hour";
+"7-Day" = "7-Day";
 "%dd" = "%dd";
 "today" = "today";
 "just now" = "just now";

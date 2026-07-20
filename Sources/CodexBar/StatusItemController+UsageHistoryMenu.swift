@@ -65,6 +65,19 @@ extension StatusItemController {
         chartItem.representedObject = Self.usageHistoryChartID
         chartItem.toolTip = provider.rawValue
         submenu.addItem(chartItem)
+
+        if let cycleListView = PlanUtilizationSessionCycleListMenuView(histories: histories, width: width) {
+            let cycleHosting = UsageHistoryMenuHostingView(rootView: cycleListView)
+            cycleHosting.frame = NSRect(
+                origin: .zero,
+                size: NSSize(width: width, height: self.hostedSubviewFittingHeight(for: cycleHosting, width: width)))
+            let cycleItem = NSMenuItem()
+            cycleItem.view = cycleHosting
+            cycleItem.isEnabled = true
+            cycleItem.representedObject = "\(Self.usageHistoryChartID).cycleList"
+            cycleItem.toolTip = provider.rawValue
+            submenu.addItem(cycleItem)
+        }
         return true
     }
 }

@@ -5,8 +5,36 @@ struct KimiUsageResponse: Codable {
 }
 
 struct KimiCodeAPIUsageResponse: Codable {
+    let user: KimiUserInfo?
     let usage: KimiUsageDetail
     let limits: [KimiRateLimit]?
+}
+
+struct KimiUserInfo: Codable, Sendable {
+    let membership: KimiMembership?
+}
+
+struct KimiMembership: Codable, Sendable {
+    let level: String?
+}
+
+/// Response of `POST https://www.kimi.com/apiv2/kimi.gateway.membership.v2.MembershipService/GetSubscription`.
+struct KimiSubscriptionResponse: Codable, Sendable {
+    let subscribed: Bool?
+    let purchaseSubscription: KimiPurchaseSubscription?
+}
+
+struct KimiPurchaseSubscription: Codable, Sendable {
+    let goods: KimiSubscriptionGoods?
+    let status: String?
+    let active: Bool?
+    let currentEndTime: String?
+}
+
+struct KimiSubscriptionGoods: Codable, Sendable {
+    /// Server-provided plan display name, e.g. "Allegretto".
+    let title: String?
+    let membershipLevel: String?
 }
 
 struct KimiSubscriptionStatsResponse: Codable {

@@ -1148,3 +1148,6 @@
 "Show Codex Spark usage" = "Codex Spark-gebruik tonen";
 "Shows Codex Spark quota rows in the menu and provider preview. Requires optional credits and extra usage in Display settings." = "Toont Codex Spark-quotumregels in het menu en de voorvertoning van de provider. Vereist dat ‘Toon credits + extra gebruik’ is ingeschakeld in de instellingen voor Weergave.";
 "Scroll to see more models" = "Scroll om meer modellen te bekijken";
+"5-Hour" = "5 uur";
+"7-Day" = "7 dagen";
+"Recent 5-Hour Cycles" = "Recente 5-uurcycli";

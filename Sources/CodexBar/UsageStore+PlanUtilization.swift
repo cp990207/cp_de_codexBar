@@ -8,7 +8,6 @@ extension UsageStore {
     private nonisolated static let claudeOAuthAccountUuidMapDefaultsKey = "ClaudeOAuthHistoryOwnerAccountUuidMapV1"
     private nonisolated static let claudeOAuthAccountCandidateMapDefaultsKey =
         "ClaudeOAuthHistoryOwnerAccountCandidateMapV1"
-    private nonisolated static let weeklyWindowMinutes = 7 * 24 * 60
     private nonisolated static let planUtilizationUnscopedPreferredKey = "__unscoped__"
     private nonisolated static let claudeOAuthPlanUtilizationAccountKeyPrefix = "__claude_oauth__:"
 
@@ -41,7 +40,7 @@ extension UsageStore {
 
     func supportsPlanUtilizationHistory(for provider: UsageProvider) -> Bool {
         switch provider {
-        case .codex, .claude:
+        case .codex, .claude, .kimi:
             true
         default:
             if self.planUtilizationHistory[provider]?.isEmpty == false {
@@ -60,17 +59,6 @@ extension UsageStore {
     private nonisolated static let planUtilizationMinSampleIntervalSeconds: TimeInterval = 60 * 60
     private nonisolated static let planUtilizationResetEquivalenceToleranceSeconds: TimeInterval = 2 * 60
     private nonisolated static let planUtilizationMaxSamples: Int = 24 * 730
-
-    private struct PlanUtilizationSeriesKey: Hashable {
-        let name: PlanUtilizationSeriesName
-        let windowMinutes: Int
-    }
-
-    private struct PlanUtilizationSeriesSample {
-        let name: PlanUtilizationSeriesName
-        let windowMinutes: Int
-        let entry: PlanUtilizationHistoryEntry
-    }
 
     private struct LimitResetDetectionContext {
         let provider: UsageProvider
@@ -263,7 +251,7 @@ extension UsageStore {
 
     private func shouldRecordPlanUtilizationHistory(for provider: UsageProvider) -> Bool {
         switch provider {
-        case .codex, .claude:
+        case .codex, .claude, .kimi:
             true
         default:
             self.settings.historicalTrackingEnabled
@@ -388,7 +376,7 @@ extension UsageStore {
     }
     #endif
 
-    private nonisolated static func clampedPercent(_ value: Double?) -> Double? {
+    nonisolated static func clampedPercent(_ value: Double?) -> Double? {
         guard let value else { return nil }
         return max(0, min(100, value))
     }
@@ -546,84 +534,6 @@ extension UsageStore {
         guard let previous else { return true }
         guard let current else { return false }
         return !self.areEquivalentPlanUtilizationResetBoundaries(previous, current) && current > previous
-    }
-
-    private func planUtilizationSeriesSamples(
-        provider: UsageProvider,
-        snapshot: UsageSnapshot,
-        capturedAt: Date) -> [PlanUtilizationSeriesSample]
-    {
-        var samplesByKey: [PlanUtilizationSeriesKey: PlanUtilizationSeriesSample] = [:]
-
-        func appendWindow(_ window: RateWindow?, name: PlanUtilizationSeriesName?) {
-            guard let name,
-                  let window,
-                  let windowMinutes = window.windowMinutes,
-                  windowMinutes > 0,
-                  let usedPercent = Self.clampedPercent(window.usedPercent)
-            else {
-                return
-            }
-
-            let canonicalWindowMinutes = name.canonicalWindowMinutes(windowMinutes)
-            let key = PlanUtilizationSeriesKey(name: name, windowMinutes: canonicalWindowMinutes)
-            samplesByKey[key] = PlanUtilizationSeriesSample(
-                name: name,
-                windowMinutes: canonicalWindowMinutes,
-                entry: PlanUtilizationHistoryEntry(
-                    capturedAt: capturedAt,
-                    usedPercent: usedPercent,
-                    resetsAt: window.resetsAt))
-        }
-
-        switch provider {
-        case .codex:
-            let projection = self.codexConsumerProjection(
-                surface: .liveCard,
-                snapshotOverride: snapshot,
-                now: capturedAt)
-            for lane in projection.planUtilizationLanes {
-                appendWindow(lane.window, name: lane.role)
-            }
-        case .claude:
-            appendWindow(snapshot.primary, name: .session)
-            appendWindow(snapshot.secondary, name: .weekly)
-            appendWindow(snapshot.tertiary, name: .opus)
-        case .antigravity:
-            let namedWeeklyWindows = snapshot.extraRateWindows?
-                .filter {
-                    $0.usageKnown
-                        && $0.id.hasPrefix("antigravity-quota-summary-")
-                        && $0.window.windowMinutes == Self.weeklyWindowMinutes
-                }
-                .map(\.window) ?? []
-            if let mostUsedWeeklyWindow = namedWeeklyWindows.max(by: { $0.usedPercent < $1.usedPercent }) {
-                appendWindow(mostUsedWeeklyWindow, name: .weekly)
-            } else {
-                for window in [snapshot.primary, snapshot.secondary, snapshot.tertiary] {
-                    guard let window, window.windowMinutes == Self.weeklyWindowMinutes else { continue }
-                    appendWindow(window, name: .weekly)
-                }
-            }
-        default:
-            let standardWeeklyWindow = [snapshot.primary, snapshot.secondary, snapshot.tertiary]
-                .compactMap(\.self)
-                .first { $0.windowMinutes == Self.weeklyWindowMinutes }
-            let extraWeeklyWindow = snapshot.extraRateWindows?
-                .lazy
-                .first { $0.usageKnown && $0.window.windowMinutes == Self.weeklyWindowMinutes }?
-                .window
-            if let weeklyWindow = standardWeeklyWindow ?? extraWeeklyWindow {
-                appendWindow(weeklyWindow, name: .weekly)
-            }
-        }
-
-        return samplesByKey.values.sorted { lhs, rhs in
-            if lhs.windowMinutes != rhs.windowMinutes {
-                return lhs.windowMinutes < rhs.windowMinutes
-            }
-            return lhs.name.rawValue < rhs.name.rawValue
-        }
     }
 
     private nonisolated static func planUtilizationHourBucket(for date: Date) -> Int64 {
