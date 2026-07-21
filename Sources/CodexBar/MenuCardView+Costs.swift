@@ -180,6 +180,8 @@ extension UsageMenuCardView.Model {
             L("AWS Cost Explorer billing can lag.")
         case .openai:
             L("Reported by OpenAI Admin API organization usage.")
+        case .kimi:
+            L("Estimated from local Kimi Code logs, priced at Kimi open-platform list rates.")
         case .mistral:
             L("Reported by Mistral billing usage.")
         default:

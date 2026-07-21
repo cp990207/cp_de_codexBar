@@ -172,6 +172,61 @@ struct InlineCostHistoryDashboardLabelTests {
     }
 
     @Test
+    func `kimi cost history shows the codex style KPI grid`() throws {
+        let now = Date(timeIntervalSince1970: 1_700_179_200)
+        let metadata = try #require(ProviderDefaults.metadata[.kimi])
+        let tokenSnapshot = CostUsageTokenSnapshot(
+            sessionTokens: 275,
+            sessionCostUSD: 0.25,
+            last30DaysTokens: 425,
+            last30DaysCostUSD: 0.37,
+            daily: [
+                CostUsageDailyReport.Entry(
+                    date: "2023-11-15",
+                    inputTokens: 200,
+                    outputTokens: 75,
+                    totalTokens: 275,
+                    costUSD: 0.25,
+                    modelsUsed: ["kimi-for-coding"],
+                    modelBreakdowns: nil),
+            ],
+            updatedAt: now)
+
+        let model = UsageMenuCardView.Model.make(.init(
+            provider: .kimi,
+            metadata: metadata,
+            snapshot: UsageSnapshot(
+                primary: nil,
+                secondary: nil,
+                updatedAt: now),
+            credits: nil,
+            creditsError: nil,
+            dashboard: nil,
+            dashboardError: nil,
+            tokenSnapshot: tokenSnapshot,
+            tokenError: nil,
+            account: AccountInfo(email: nil, plan: nil),
+            isRefreshing: false,
+            lastError: nil,
+            usageBarsShowUsed: false,
+            resetTimeDisplayStyle: .countdown,
+            tokenCostUsageEnabled: true,
+            showOptionalCreditsAndExtraUsage: true,
+            hidePersonalInfo: false,
+            now: now))
+
+        let dashboard = try #require(model.inlineUsageDashboard)
+        #expect(dashboard.kpis.count == 4)
+        #expect(dashboard.kpis[0].title == "Today")
+        #expect(dashboard.kpis[0].value == "$0.25")
+        #expect(dashboard.kpis[1].title == "30d cost")
+        #expect(dashboard.kpis[1].value == "$0.37")
+        #expect(dashboard.kpis[2].title == "30d tokens")
+        #expect(dashboard.kpis[3].title == "Latest tokens")
+        #expect(dashboard.kpis[3].value == "275")
+    }
+
+    @Test
     func `costHistoryInlineDashboard sets currencyCode from snapshot`() throws {
         let now = Date(timeIntervalSince1970: 1_700_179_200)
         let metadata = try #require(ProviderDefaults.metadata[.claude])

@@ -121,6 +121,14 @@ public struct CostUsageFetcher: Sendable {
         modelsDevClient: ModelsDevClient = ModelsDevClient(),
         retryUnknownPricing: Bool = true) async throws -> CostUsageTokenSnapshot
     {
+        if provider == .kimi {
+            return try await self.loadKimiTokenSnapshot(
+                environment: environment,
+                now: now,
+                forceRefresh: forceRefresh,
+                historyDays: historyDays,
+                cacheRoot: overrideScannerOptions?.cacheRoot)
+        }
         guard provider == .codex || provider == .claude || provider == .vertexai || provider == .bedrock else {
             throw CostUsageError.unsupportedProvider(provider)
         }
@@ -276,6 +284,33 @@ public struct CostUsageFetcher: Sendable {
             now: now,
             historyDays: clampedHistoryDays,
             projects: scanResult.projects)
+    }
+
+    private static func loadKimiTokenSnapshot(
+        environment: [String: String],
+        now: Date,
+        forceRefresh: Bool,
+        historyDays: Int,
+        cacheRoot: URL?) async throws -> CostUsageTokenSnapshot
+    {
+        let clampedHistoryDays = max(1, min(365, historyDays))
+        let since = Calendar.current.date(byAdding: .day, value: -(clampedHistoryDays - 1), to: now) ?? now
+        let kimiOptions = KimiCostScanner.Options(
+            cacheRoot: cacheRoot,
+            refreshMinIntervalSeconds: forceRefresh ? 0 : 60,
+            environment: environment)
+        let daily = try await CostUsageScanExecutor.run { checkCancellation in
+            try KimiCostScanner.loadDailyReportCancellable(
+                since: since,
+                until: now,
+                now: now,
+                options: kimiOptions,
+                checkCancellation: checkCancellation)
+        }
+        return Self.tokenSnapshot(
+            from: daily,
+            now: now,
+            historyDays: clampedHistoryDays)
     }
 
     private struct UnknownPricingRefreshRequest: Sendable {
