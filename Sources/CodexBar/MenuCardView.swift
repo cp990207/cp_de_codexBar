@@ -1325,7 +1325,10 @@ extension UsageMenuCardView.Model {
             let detail = primary.resetDescription,
             !detail.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         {
-            primaryDetailText = detail
+            // Kimi: replace the weekly request-count detail with today's local token usage.
+            primaryDetailText = input.provider == .kimi
+                ? KimiTokenUsageText.todayDetail(entry: input.tokenSnapshot?.currentDayEntry())
+                : detail
         }
         if let balance = Self.poeBalanceDetailText(input: input) {
             primaryDetailText = balance

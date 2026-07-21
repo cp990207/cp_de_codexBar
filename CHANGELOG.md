@@ -14,7 +14,8 @@
 - Quota warnings: add opt-in predictive pace alerts for Codex and Claude session and weekly limits, with one alert per risk episode. Thanks @vincent-peng!
 - Kimi: show the membership plan name in the menu — read from `MembershipService/GetSubscription` for cookie auth and from the Code API membership level for API-key auth — and surface weekly request counts alongside the quota bars.
 - Kimi: record 5-hour and weekly plan utilization history — the Plan Usage submenu gains a 5-Hour/7-Day segmented chart and a recent 5-hour cycle list, matching the Claude and Codex history views.
-- Kimi: estimate token usage and cost from local Kimi Code CLI logs (`~/.kimi-code/sessions`) — usage is aggregated by day and model across uncached input, output, cache-read, and cache-write tokens; the menu card gains the Codex-style KPI grid (Today, 30d cost, 30d tokens, Latest tokens) with a daily cost chart, and the Cost submenu lists per-model breakdowns per day. Costs use Kimi open-platform list rates for reference; also available via `codexbar cost --provider kimi`.
+- Kimi: estimate token usage and cost from local Kimi Code CLI logs (`~/.kimi-code/sessions`) — usage is aggregated by day and model across uncached input, output, cache-read, and cache-write tokens; the menu card gains the Codex-style KPI grid (Today, 30d cost, 30d tokens, Latest tokens) with a daily cost chart, and the Cost submenu lists per-model breakdowns per day. Costs use Kimi open-platform CN list rates and display in CNY (CN¥), for reference; also available via `codexbar cost --provider kimi`.
+- Kimi: replace the weekly request-count detail under the quota bar with today's local token usage — input, output, cache reads, and request count at a glance.
 
 ### Fixed
 - Menus: stop completed provider cards and plan-utilization rows from remaining in “Refreshing…” while unrelated provider or token-cost work is still running. Thanks @Yuxin-Qiao!

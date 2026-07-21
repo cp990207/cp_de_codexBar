@@ -3,9 +3,9 @@ import Foundation
 extension CostUsagePricing {
     // MARK: - Kimi
 
-    /// Kimi Code CLI (kimi.com coding subscription) has no public per-token price; models.dev lists
-    /// the kimi-for-coding family at $0. These are the Kimi open-platform list rates for the
-    /// equivalent public models, used only to estimate what the usage would have cost.
+    /// Kimi Code CLI (kimi.com coding subscription) is not metered per token. These are the Kimi
+    /// open-platform CN list rates (platform.kimi.com, CNY per token) for the equivalent public
+    /// models, used only to estimate what the usage would have cost.
     struct KimiPricing {
         /// Non-cached input rate (wire field `inputOther`). Unlike Codex, Kimi reports non-cached
         /// input directly — cached reads are a separate bucket, not a subset of input.
@@ -17,23 +17,23 @@ extension CostUsagePricing {
     }
 
     private static let kimi: [String: KimiPricing] = [
-        // Mirrors kimi-k2.7-code ($0.95 / $4.00 / $0.19 per 1M).
+        // Mirrors kimi-k2.7-code CN list rates (¥6.50 / ¥27.00 / ¥1.30 per 1M).
         "kimi-for-coding": KimiPricing(
-            inputCostPerToken: 9.5e-7,
-            outputCostPerToken: 4e-6,
-            cacheReadInputCostPerToken: 1.9e-7,
+            inputCostPerToken: 6.5e-6,
+            outputCostPerToken: 2.7e-5,
+            cacheReadInputCostPerToken: 1.3e-6,
             cacheWriteInputCostPerToken: nil),
-        // Mirrors kimi-k2.7-code-highspeed ($1.90 / $8.00 / $0.38 per 1M).
+        // Mirrors kimi-k2.7-code-highspeed CN list rates (¥13.00 / ¥54.00 / ¥2.60 per 1M).
         "kimi-for-coding-highspeed": KimiPricing(
-            inputCostPerToken: 1.9e-6,
-            outputCostPerToken: 8e-6,
-            cacheReadInputCostPerToken: 3.8e-7,
+            inputCostPerToken: 1.3e-5,
+            outputCostPerToken: 5.4e-5,
+            cacheReadInputCostPerToken: 2.6e-6,
             cacheWriteInputCostPerToken: nil),
-        // Mirrors kimi-k3 ($3.00 / $15.00 / $0.30 per 1M).
+        // Mirrors kimi-k3 CN list rates (¥20.00 / ¥100.00 / ¥2.00 per 1M).
         "k3": KimiPricing(
-            inputCostPerToken: 3e-6,
-            outputCostPerToken: 1.5e-5,
-            cacheReadInputCostPerToken: 3e-7,
+            inputCostPerToken: 2e-5,
+            outputCostPerToken: 1e-4,
+            cacheReadInputCostPerToken: 2e-6,
             cacheWriteInputCostPerToken: nil),
     ]
 
@@ -66,7 +66,8 @@ extension CostUsagePricing {
         return trimmed
     }
 
-    static func kimiCostUSD(
+    /// Estimated cost in CNY at Kimi open-platform CN list rates; nil when the model is unknown.
+    static func kimiCostCNY(
         model: String,
         inputTokens: Int,
         cachedInputTokens: Int,

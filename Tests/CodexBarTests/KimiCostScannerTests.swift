@@ -177,13 +177,13 @@ struct KimiCostScannerTests {
 
         let entry = try #require(report.data.first)
         let known = try #require(entry.modelBreakdowns?.first { $0.modelName == "kimi-for-coding" })
-        // $0.95 input + $0.19 cache read + $4.00 output per 1M tokens.
-        #expect(try #require(known.costUSD) == 5.14)
+        // ¥6.50 input + ¥1.30 cache read + ¥27.00 output per 1M tokens.
+        #expect(try #require(known.costUSD) == 34.8)
         let unknown = try #require(entry.modelBreakdowns?.first { $0.modelName == "future-model-9" })
         #expect(unknown.costUSD == nil)
         #expect(unknown.totalTokens == 35)
         // Day cost only includes priceable models.
-        #expect(try #require(entry.costUSD) == 5.14)
+        #expect(try #require(entry.costUSD) == 34.8)
     }
 
     @Test
@@ -259,6 +259,7 @@ struct KimiCostScannerTests {
         #expect(entry.modelBreakdowns?.first?.modelName == "kimi-for-coding")
         #expect(snapshot.sessionTokens == 1110)
         #expect(snapshot.sessionCostUSD != nil)
+        #expect(snapshot.currencyCode == "CNY")
         #expect(snapshot.projects.isEmpty)
     }
 }

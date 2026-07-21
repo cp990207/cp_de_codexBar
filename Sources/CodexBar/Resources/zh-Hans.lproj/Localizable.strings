@@ -651,6 +651,7 @@
 "cost_header_estimated" = "费用（估算）";
 "cost_estimate_hint" = "根据本地日志估算 · 可能与账单不同";
 "Estimated from local Codex logs for the selected account." = "根据所选账户的本地 Codex 日志估算。";
+"Estimated from local Kimi Code logs, priced at Kimi open-platform list rates (CNY)." = "根据本地 Kimi Code 日志估算，按 Kimi 开放平台人民币刊例价计价。";
 "No JetBrains IDE with AI Assistant detected. Install a JetBrains IDE and enable AI Assistant." = "未检测到启用 AI Assistant 的 JetBrains IDE。请安装 JetBrains IDE 并启用 AI Assistant。";
 "OpenRouter API token not configured. Set OPENROUTER_API_KEY environment variable or configure in Settings." = "未配置 OpenRouter API 令牌。请设置 OPENROUTER_API_KEY 环境变量，或在“设置”中配置。";
 "z.ai API token not found. Set apiKey in ~/.codexbar/config.json or Z_AI_API_KEY." = "未找到 z.ai API 令牌。请在 ~/.codexbar/config.json 中设置 apiKey，或设置 Z_AI_API_KEY。";
@@ -755,6 +756,7 @@
 "Today: %@ · %@ tokens" = "今日：%@ · %@ token";
 "Today: %@" = "今日：%@";
 "Today: %@ tokens" = "今日：%@ token";
+"Today: in %@ · out %@ · cache read %@ · %lld requests" = "今日：输入 %@ · 输出 %@ · 缓存读 %@ · %lld 次请求";
 "Last 30 days: %@ · %@ tokens" = "近 30 天：%@ · %@ token";
 "Last 30 days: %@" = "近 30 天：%@";
 "Est. total (30d): %@" = "近 30 天估算总计：%@";

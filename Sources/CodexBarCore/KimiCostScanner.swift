@@ -3,7 +3,7 @@ import Foundation
 /// Scans Kimi Code CLI session logs (`<KIMI_CODE_HOME>/sessions/** /wire.jsonl`, default
 /// `~/.kimi-code/sessions`) and aggregates turn-level `usage.record` events into a
 /// `CostUsageDailyReport`. Usage is estimated from local logs; costs use Kimi open-platform
-/// list rates since the coding subscription itself is not metered per token.
+/// CN list rates (CNY) since the coding subscription itself is not metered per token.
 enum KimiCostScanner {
     struct Options {
         /// Explicit Kimi Code home directory (the one containing `sessions/`). When nil,
@@ -246,7 +246,7 @@ enum KimiCostScanner {
 
             for model in models.keys.sorted() {
                 guard let usage = models[model] else { continue }
-                let cost = CostUsagePricing.kimiCostUSD(
+                let cost = CostUsagePricing.kimiCostCNY(
                     model: model,
                     inputTokens: usage.inputTokens,
                     cachedInputTokens: usage.cacheReadTokens,

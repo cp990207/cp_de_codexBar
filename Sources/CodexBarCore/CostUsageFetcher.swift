@@ -310,7 +310,8 @@ public struct CostUsageFetcher: Sendable {
         return Self.tokenSnapshot(
             from: daily,
             now: now,
-            historyDays: clampedHistoryDays)
+            historyDays: clampedHistoryDays,
+            currencyCode: "CNY")
     }
 
     private struct UnknownPricingRefreshRequest: Sendable {
@@ -487,7 +488,8 @@ public struct CostUsageFetcher: Sendable {
         historyDays: Int = 30,
         useCurrentLocalDayForSession: Bool = true,
         projects: [CostUsageProjectBreakdown] = [],
-        updatedAt: Date? = nil) -> CostUsageTokenSnapshot
+        updatedAt: Date? = nil,
+        currencyCode: String = "USD") -> CostUsageTokenSnapshot
     {
         let sessionEntry = useCurrentLocalDayForSession
             ? CostUsageTokenSnapshot.entry(in: daily.data, forLocalDayContaining: now)
@@ -520,6 +522,7 @@ public struct CostUsageFetcher: Sendable {
             sessionCostUSD: sessionCostUSD,
             last30DaysTokens: last30DaysTokens,
             last30DaysCostUSD: last30DaysCostUSD,
+            currencyCode: currencyCode,
             historyDays: historyDays,
             daily: daily.data,
             projects: projects,

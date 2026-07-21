@@ -180,6 +180,7 @@ struct InlineCostHistoryDashboardLabelTests {
             sessionCostUSD: 0.25,
             last30DaysTokens: 425,
             last30DaysCostUSD: 0.37,
+            currencyCode: "CNY",
             daily: [
                 CostUsageDailyReport.Entry(
                     date: "2023-11-15",
@@ -218,12 +219,13 @@ struct InlineCostHistoryDashboardLabelTests {
         let dashboard = try #require(model.inlineUsageDashboard)
         #expect(dashboard.kpis.count == 4)
         #expect(dashboard.kpis[0].title == "Today")
-        #expect(dashboard.kpis[0].value == "$0.25")
+        #expect(dashboard.kpis[0].value == "CN¥0.25")
         #expect(dashboard.kpis[1].title == "30d cost")
-        #expect(dashboard.kpis[1].value == "$0.37")
+        #expect(dashboard.kpis[1].value == "CN¥0.37")
         #expect(dashboard.kpis[2].title == "30d tokens")
         #expect(dashboard.kpis[3].title == "Latest tokens")
         #expect(dashboard.kpis[3].value == "275")
+        #expect(dashboard.currencyCode == "CNY")
     }
 
     @Test

@@ -181,11 +181,16 @@ struct MenuDescriptor {
                     window: primaryWindow,
                     resetStyle: resetStyle,
                     showUsed: settings.usageBarsShowUsed)
-                if primaryDescriptionIsDetail,
-                   let primaryDetail,
-                   !primaryDetail.isEmpty
-                {
-                    entries.append(.text(primaryDetail, .secondary))
+                if primaryDescriptionIsDetail {
+                    // Kimi: replace the weekly request-count detail with today's local token usage.
+                    let detailText: String? = if provider == .kimi {
+                        KimiTokenUsageText.todayDetail(entry: store.tokenSnapshot(for: .kimi)?.currentDayEntry())
+                    } else {
+                        primaryDetail
+                    }
+                    if let detailText, !detailText.isEmpty {
+                        entries.append(.text(detailText, .secondary))
+                    }
                 }
                 if provider == .crof,
                    primary.resetsAt != nil,
