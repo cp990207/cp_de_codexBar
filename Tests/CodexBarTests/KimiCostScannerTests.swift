@@ -187,6 +187,34 @@ struct KimiCostScannerTests {
     }
 
     @Test
+    func `prices k3-256k at half the k3 list rates`() throws {
+        let fixture = try KimiTestHome()
+        defer { fixture.cleanup() }
+
+        let day = try self.localNoon(year: 2026, month: 7, day: 20)
+        try fixture.writeWire(session: "session-a", lines: [
+            self.usageRecord(
+                model: "kimi-code/k3-256k",
+                time: day,
+                input: 1_000_000,
+                cacheRead: 1_000_000,
+                output: 1_000_000),
+        ])
+
+        let report = try KimiCostScanner.loadDailyReportCancellable(
+            since: day.addingTimeInterval(-3600),
+            until: day.addingTimeInterval(3600),
+            options: fixture.options(),
+            checkCancellation: nil)
+
+        let entry = try #require(report.data.first)
+        let k3Half = try #require(entry.modelBreakdowns?.first { $0.modelName == "k3-256k" })
+        // ¥10.00 input + ¥1.00 cache read + ¥50.00 output per 1M tokens.
+        #expect(try #require(k3Half.costUSD) == 61.0)
+        #expect(try #require(entry.costUSD) == 61.0)
+    }
+
+    @Test
     func `honors KIMI_CODE_HOME from the provided environment`() throws {
         let fixture = try KimiTestHome()
         defer { fixture.cleanup() }

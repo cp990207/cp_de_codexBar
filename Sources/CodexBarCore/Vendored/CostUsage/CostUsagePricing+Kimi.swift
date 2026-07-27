@@ -35,6 +35,12 @@ extension CostUsagePricing {
             outputCostPerToken: 1e-4,
             cacheReadInputCostPerToken: 2e-6,
             cacheWriteInputCostPerToken: nil),
+        // Mirrors kimi-k3-256k CN list rates (¥10.00 / ¥50.00 / ¥1.00 per 1M), half of kimi-k3.
+        "k3-256k": KimiPricing(
+            inputCostPerToken: 1e-5,
+            outputCostPerToken: 5e-5,
+            cacheReadInputCostPerToken: 1e-6,
+            cacheWriteInputCostPerToken: nil),
     ]
 
     static func kimiBuiltInPricingFingerprint() -> String {
